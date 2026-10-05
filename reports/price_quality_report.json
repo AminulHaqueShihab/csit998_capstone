@@ -1,0 +1,16 @@
+{
+  "zips_verified": 68,
+  "checksums": "all sha256 verified",
+  "raw_rows": 2069,
+  "duplicate_dates_removed": 0,
+  "rows_rejected": 0,
+  "rejection_reasons": {},
+  "rows_clean": 2069,
+  "date_min": "2021-01-01 00:00:00",
+  "date_max": "2026-08-31 00:00:00",
+  "missing_dates": [],
+  "extreme_moves_flagged": 24,
+  "extreme_move_policy": "Retained as genuine market moves; audit list in reports/price_extreme_moves.csv. Only confirmed source errors may be corrected, with an audit record.",
+  "output": "data/processed/btcusdt_1d_clean.csv",
+  "output_sha256": "ae28258b7e5bc319591dc3edc23240411765e6d2c0477bf358e6e089e4c8b36c"
+}

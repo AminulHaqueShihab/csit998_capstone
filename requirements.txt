@@ -1,0 +1,5 @@
+pandas==3.0.6
+numpy==2.5.3
+vaderSentiment==3.3.2
+langdetect==1.0.9
+pytest==9.1.1

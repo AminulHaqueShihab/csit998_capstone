@@ -1,0 +1,45 @@
+{
+  "rows": 2038,
+  "date_min": "2021-01-31 00:00:00",
+  "date_max": "2026-08-30 00:00:00",
+  "last_target_date": "2026-08-31 00:00:00",
+  "class_balance": {
+    "up(1)": 1013,
+    "not_up(0)": 1025,
+    "share_up": 0.4971
+  },
+  "warmup_days_dropped": 30,
+  "days_without_news_in_table": 17,
+  "price_features": [
+    "close",
+    "volume",
+    "return_1d",
+    "log_return_1d",
+    "close_lag_1",
+    "close_lag_7",
+    "sma_7",
+    "sma_14",
+    "sma_30",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7"
+  ],
+  "sentiment_features": [
+    "vader_mean",
+    "vader_pos_count",
+    "vader_neg_count",
+    "vader_neu_count",
+    "article_count",
+    "unique_source_count",
+    "gdelt_tone_mean",
+    "no_news_flag"
+  ],
+  "cutoff_check": "passed: every news item used on day t was available by 23:59:59 UTC on day t",
+  "output": "data/processed/modelling_table_v1.csv",
+  "output_sha256": "c4d946539b93a237d902a6609fd32c63cdccba31dd70089b226140f078aae12b"
+}

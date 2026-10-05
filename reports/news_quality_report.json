@@ -1,0 +1,28 @@
+{
+  "inputs": [
+    "gdelt_btc_news_2021_2023_raw.csv",
+    "gdelt_btc_news_2024_2026_raw.csv"
+  ],
+  "rows_loaded": 540518,
+  "precise_timestamp_present": 273750,
+  "drops": {
+    "invalid_timestamp": 0,
+    "empty_or_too_short_headline": 49,
+    "machine_translated_source": 208998,
+    "detected_non_english": 875,
+    "not_bitcoin_relevant": 6325,
+    "duplicate_url": 627,
+    "duplicate_headline_same_day": 73169
+  },
+  "rows_clean": 250475,
+  "date_min": "2021-01-01 00:00:00",
+  "date_max": "2026-08-31 00:00:00",
+  "asset_relevance_counts": {
+    "BTC": 230369,
+    "BTC+ETH": 20106
+  },
+  "articles_per_month_min": 1402,
+  "articles_per_month_max": 9373,
+  "timestamp_policy": "available_at_utc = max(gdelt_timestamp, precise_publication_timestamp when valid); an item belongs to the UTC date of available_at_utc.",
+  "output": "data/processed/news_clean.csv.gz"
+}
