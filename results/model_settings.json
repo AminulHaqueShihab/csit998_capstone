@@ -1,0 +1,89 @@
+{
+  "evaluated_at_local": "2026-10-08 23:21:29",
+  "seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+  ],
+  "threshold": 0.5,
+  "lstm_hyperparameters": {
+    "max_epochs": 150,
+    "patience": 15,
+    "batch_size": 64,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "hidden": 32,
+    "layers": 1,
+    "dropout": 0.2,
+    "mean_val_loss": 0.6897404293219248
+  },
+  "xgboost_hyperparameters": {
+    "max_depth": 3,
+    "learning_rate": 0.1,
+    "val_loss": 0.6878168058919383
+  },
+  "seq_len": 14,
+  "split_dates": {
+    "train": [
+      "2021-01-01",
+      "2024-12-31"
+    ],
+    "validation": [
+      "2025-01-01",
+      "2025-09-30"
+    ],
+    "test": [
+      "2025-10-01",
+      "2026-08-30"
+    ]
+  },
+  "model_a_features": [
+    "return_1d",
+    "log_return_1d",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7",
+    "log_volume"
+  ],
+  "model_b_features": [
+    "return_1d",
+    "log_return_1d",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7",
+    "log_volume",
+    "vader_mean",
+    "vader_pos_share",
+    "vader_neg_share",
+    "log_article_count",
+    "no_news_flag"
+  ],
+  "modelling_table_sha256": "c4d946539b93a237d902a6609fd32c63cdccba31dd70089b226140f078aae12b",
+  "sequences_sha256": "97df12e1a2c48c277ba17bebdaad06b7841ce012ade586321b2842abb13a123a",
+  "versions": {
+    "torch": "2.14.1",
+    "xgboost": "3.4.1",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6"
+  },
+  "python": "3.13.15",
+  "model_files": "models/<name>_seed<seed>.pt (LSTM state dicts)"
+}

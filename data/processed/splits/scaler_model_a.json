@@ -1,0 +1,47 @@
+{
+  "columns": [
+    "return_1d",
+    "log_return_1d",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7",
+    "log_volume"
+  ],
+  "mean": {
+    "return_1d": 0.0012090111052621855,
+    "log_return_1d": 0.0007021043940868257,
+    "close_over_sma_7": 1.0025461128640865,
+    "close_over_sma_30": 1.0129962113098383,
+    "momentum_7": 0.008861700908242422,
+    "momentum_14": 0.017875379352405605,
+    "rsi_14": 52.360064021668265,
+    "volatility_14": 0.029589118431247587,
+    "hl_range_pct": 0.046543301320689845,
+    "volume_ratio_7": 1.0024224746082293,
+    "log_volume": 10.939842182207535
+  },
+  "std": {
+    "return_1d": 0.03185509790324697,
+    "log_return_1d": 0.0318315133879673,
+    "close_over_sma_7": 0.04321063221299802,
+    "close_over_sma_30": 0.10074349022490414,
+    "momentum_7": 0.08552791889366092,
+    "momentum_14": 0.12412046188828027,
+    "rsi_14": 17.670540436585704,
+    "volatility_14": 0.012213390093565103,
+    "hl_range_pct": 0.03151593380969499,
+    "volume_ratio_7": 0.3890590208291033,
+    "log_volume": 0.8853308409189885
+  },
+  "fitted_on": {
+    "split": "train",
+    "rows": 1431,
+    "date_min": "2021-01-31",
+    "date_max": "2024-12-31"
+  }
+}

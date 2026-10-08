@@ -3,3 +3,6 @@ numpy==2.5.3
 vaderSentiment==3.3.2
 langdetect==1.0.9
 pytest==9.1.1
+torch==2.14.1
+xgboost==3.4.1
+scikit-learn==1.9.1

@@ -1,0 +1,20 @@
+{
+  "frozen": "2026-10-08, before any model was trained",
+  "split_dates_utc": {
+    "train": [
+      "2021-01-01",
+      "2024-12-31"
+    ],
+    "validation": [
+      "2025-01-01",
+      "2025-09-30"
+    ],
+    "test": [
+      "2025-10-01",
+      "2026-08-30"
+    ]
+  },
+  "seq_len_days": 14,
+  "sample_definition": "sample for day t = features of days t-SEQ_LEN+1..t; target = Close(t+1) > Close(t)",
+  "note": "Test results must not be used for feature selection, thresholds, scaling, tuning or early stopping."
+}

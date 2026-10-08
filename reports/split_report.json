@@ -1,0 +1,95 @@
+{
+  "seq_len": 14,
+  "splits": {
+    "train": {
+      "first_day": "2021-02-13",
+      "last_day": "2024-12-31",
+      "n": 1418,
+      "up": 704,
+      "share_up": 0.4965,
+      "days_without_news": 0
+    },
+    "validation": {
+      "first_day": "2025-01-01",
+      "last_day": "2025-09-30",
+      "n": 273,
+      "up": 139,
+      "share_up": 0.5092,
+      "days_without_news": 17
+    },
+    "test": {
+      "first_day": "2025-10-01",
+      "last_day": "2026-08-30",
+      "n": 334,
+      "up": 162,
+      "share_up": 0.485,
+      "days_without_news": 0
+    }
+  },
+  "shapes": {
+    "X_a_train": [
+      1418,
+      14,
+      11
+    ],
+    "X_b_train": [
+      1418,
+      14,
+      16
+    ],
+    "X_a_validation": [
+      273,
+      14,
+      11
+    ],
+    "X_b_validation": [
+      273,
+      14,
+      16
+    ],
+    "X_a_test": [
+      334,
+      14,
+      11
+    ],
+    "X_b_test": [
+      334,
+      14,
+      16
+    ]
+  },
+  "model_a_features": [
+    "return_1d",
+    "log_return_1d",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7",
+    "log_volume"
+  ],
+  "model_b_features": [
+    "return_1d",
+    "log_return_1d",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7",
+    "log_volume",
+    "vader_mean",
+    "vader_pos_share",
+    "vader_neg_share",
+    "log_article_count",
+    "no_news_flag"
+  ],
+  "scaler": "z-score, mean/std from training rows only; binary flag unscaled; saved in scaler_model_*.json",
+  "train_rows_dropped_for_lookback": 13,
+  "sequences_sha256": "97df12e1a2c48c277ba17bebdaad06b7841ce012ade586321b2842abb13a123a"
+}

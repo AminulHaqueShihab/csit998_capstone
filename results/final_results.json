@@ -1,0 +1,238 @@
+{
+  "reruns": 0,
+  "test_n": 334,
+  "test_share_up": 0.48502994011976047,
+  "comparison": {
+    "naive_majority": {
+      "n_seeds": 1,
+      "accuracy_mean": 0.5149700598802395,
+      "accuracy_std": 0.0,
+      "accuracy_ensemble": 0.5149700598802395,
+      "balanced_accuracy_mean": 0.5,
+      "balanced_accuracy_std": 0.0,
+      "balanced_accuracy_ensemble": 0.5,
+      "precision_mean": 0.0,
+      "precision_std": 0.0,
+      "precision_ensemble": 0.0,
+      "recall_mean": 0.0,
+      "recall_std": 0.0,
+      "recall_ensemble": 0.0,
+      "f1_mean": 0.0,
+      "f1_std": 0.0,
+      "f1_ensemble": 0.0
+    },
+    "lstm_a_price_only": {
+      "n_seeds": 10,
+      "accuracy_mean": 0.48712574850299406,
+      "accuracy_std": 0.014110025949638531,
+      "accuracy_ensemble": 0.5,
+      "balanced_accuracy_mean": 0.48723083548664936,
+      "balanced_accuracy_std": 0.013690716522824987,
+      "balanced_accuracy_ensemble": 0.4982055699109963,
+      "precision_mean": 0.47186669771086087,
+      "precision_std": 0.012609625802977755,
+      "precision_ensemble": 0.48299319727891155,
+      "recall_mean": 0.49074074074074076,
+      "recall_std": 0.13057416030645114,
+      "recall_ensemble": 0.4382716049382716,
+      "f1_mean": 0.4733013217649905,
+      "f1_std": 0.06266546225695924,
+      "f1_ensemble": 0.459546925566343
+    },
+    "lstm_b_price_plus_sentiment": {
+      "n_seeds": 10,
+      "accuracy_mean": 0.47844311377245513,
+      "accuracy_std": 0.00972938731094126,
+      "accuracy_ensemble": 0.48502994011976047,
+      "balanced_accuracy_mean": 0.47854938271604947,
+      "balanced_accuracy_std": 0.010243138221369652,
+      "balanced_accuracy_ensemble": 0.4829529141544645,
+      "precision_mean": 0.4600291984958596,
+      "precision_std": 0.016700116133583635,
+      "precision_ensemble": 0.4652777777777778,
+      "recall_mean": 0.48209876543209884,
+      "recall_std": 0.17074234754606674,
+      "recall_ensemble": 0.41358024691358025,
+      "f1_mean": 0.457762036727235,
+      "f1_std": 0.09021153408533492,
+      "f1_ensemble": 0.43790849673202614
+    },
+    "xgboost_price": {
+      "n_seeds": 10,
+      "accuracy_mean": 0.47694610778443114,
+      "accuracy_std": 0.022606277462290603,
+      "accuracy_ensemble": 0.4940119760479042,
+      "balanced_accuracy_mean": 0.47506818834338216,
+      "balanced_accuracy_std": 0.023906960076935692,
+      "balanced_accuracy_ensemble": 0.4923916164226242,
+      "precision_mean": 0.4530930655171911,
+      "precision_std": 0.03080383336553439,
+      "precision_ensemble": 0.47651006711409394,
+      "recall_mean": 0.41234567901234565,
+      "recall_std": 0.07694042691794016,
+      "recall_ensemble": 0.4382716049382716,
+      "f1_mean": 0.4299479039051276,
+      "f1_std": 0.05733190593349368,
+      "f1_ensemble": 0.4565916398713826
+    },
+    "xgboost_price_plus_sentiment_extra": {
+      "n_seeds": 10,
+      "accuracy_mean": 0.4868263473053892,
+      "accuracy_std": 0.024293967395330292,
+      "accuracy_ensemble": 0.47904191616766467,
+      "balanced_accuracy_mean": 0.4835845535457938,
+      "balanced_accuracy_std": 0.023426089011381164,
+      "balanced_accuracy_ensemble": 0.4771389606660924,
+      "precision_mean": 0.4681101683090965,
+      "precision_std": 0.037912567688121214,
+      "precision_ensemble": 0.4589041095890411,
+      "recall_mean": 0.3753086419753086,
+      "recall_std": 0.09159129378267362,
+      "recall_ensemble": 0.41358024691358025,
+      "f1_mean": 0.40810379921488316,
+      "f1_std": 0.06762031792571847,
+      "f1_ensemble": 0.43506493506493504
+    }
+  },
+  "confusion_matrices_ensemble": {
+    "naive_majority": {
+      "tn": 172,
+      "fp": 0,
+      "fn": 162,
+      "tp": 0
+    },
+    "lstm_a_price_only": {
+      "tn": 96,
+      "fp": 76,
+      "fn": 91,
+      "tp": 71
+    },
+    "lstm_b_price_plus_sentiment": {
+      "tn": 95,
+      "fp": 77,
+      "fn": 95,
+      "tp": 67
+    },
+    "xgboost_price": {
+      "tn": 94,
+      "fp": 78,
+      "fn": 91,
+      "tp": 71
+    },
+    "xgboost_price_plus_sentiment_extra": {
+      "tn": 93,
+      "fp": 79,
+      "fn": 95,
+      "tp": 67
+    }
+  },
+  "validation_ensemble": {
+    "naive_majority": {
+      "accuracy": 0.4908424908424908,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tn": 134,
+      "fp": 0,
+      "fn": 139,
+      "tp": 0
+    },
+    "lstm_a_price_only": {
+      "accuracy": 0.5714285714285714,
+      "balanced_accuracy": 0.5722914205948674,
+      "precision": 0.5887096774193549,
+      "recall": 0.5251798561151079,
+      "f1": 0.5551330798479087,
+      "tn": 83,
+      "fp": 51,
+      "fn": 66,
+      "tp": 73
+    },
+    "lstm_b_price_plus_sentiment": {
+      "accuracy": 0.5274725274725275,
+      "balanced_accuracy": 0.52778374315473,
+      "precision": 0.5378787878787878,
+      "recall": 0.5107913669064749,
+      "f1": 0.5239852398523985,
+      "tn": 73,
+      "fp": 61,
+      "fn": 68,
+      "tp": 71
+    },
+    "xgboost_price": {
+      "accuracy": 0.5164835164835165,
+      "balanced_accuracy": 0.5180661440996457,
+      "precision": 0.5309734513274337,
+      "recall": 0.4316546762589928,
+      "f1": 0.47619047619047616,
+      "tn": 81,
+      "fp": 53,
+      "fn": 79,
+      "tp": 60
+    },
+    "xgboost_price_plus_sentiment_extra": {
+      "accuracy": 0.5238095238095238,
+      "balanced_accuracy": 0.5251261677225384,
+      "precision": 0.5384615384615384,
+      "recall": 0.45323741007194246,
+      "f1": 0.4921875,
+      "tn": 80,
+      "fp": 54,
+      "fn": 76,
+      "tp": 63
+    }
+  },
+  "sentiment_contribution_B_minus_A": {
+    "accuracy": {
+      "mean_paired_seed_delta": -0.008682634730538919,
+      "std_paired_seed_delta": 0.02067603194086172,
+      "ensemble_delta": -0.014970059880239528,
+      "bootstrap_ensemble": {
+        "point": -0.014970059880239528,
+        "ci95_low": -0.05688622754491013,
+        "ci95_high": 0.02395209580838331,
+        "ci_excludes_zero": false,
+        "n_boot": 2000
+      },
+      "verdict": "worsened (point estimate only; 95% interval includes 0)"
+    },
+    "balanced_accuracy": {
+      "mean_paired_seed_delta": -0.008681452770600057,
+      "std_paired_seed_delta": 0.019829532035210304,
+      "ensemble_delta": -0.015252655756531786,
+      "bootstrap_ensemble": {
+        "point": -0.015252655756531786,
+        "ci95_low": -0.057050036331017885,
+        "ci95_high": 0.02514319565626769,
+        "ci_excludes_zero": false,
+        "n_boot": 2000
+      },
+      "verdict": "worsened (point estimate only; 95% interval includes 0)"
+    },
+    "precision": {
+      "mean_paired_seed_delta": -0.01183749921500129,
+      "std_paired_seed_delta": 0.02282576566733119,
+      "ensemble_delta": -0.017715419501133756,
+      "verdict": "worsened"
+    },
+    "recall": {
+      "mean_paired_seed_delta": -0.008641975308641964,
+      "std_paired_seed_delta": 0.16619044905135455,
+      "ensemble_delta": -0.024691358024691357,
+      "verdict": "worsened"
+    },
+    "f1": {
+      "mean_paired_seed_delta": -0.015539285037755474,
+      "std_paired_seed_delta": 0.08351184862571626,
+      "ensemble_delta": -0.02163842883431688,
+      "verdict": "worsened"
+    }
+  },
+  "notes": [
+    "Test set evaluated once after hyperparameters were frozen on validation data.",
+    "'ensemble' = average probability over the 10 seeds; '_mean/_std' = across single-seed models.",
+    "Bootstrap interval resamples test days (paired) for the ensemble predictions of A and B.",
+    "Correlation is not causation: differences describe prediction performance only."
+  ]
+}

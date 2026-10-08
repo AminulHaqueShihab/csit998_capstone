@@ -17,6 +17,21 @@ NEWS_SCORED = PROCESSED / "news_scored.csv.gz"
 DAILY_SENTIMENT = PROCESSED / "daily_sentiment.csv"
 MODELLING_TABLE = PROCESSED / "modelling_table_v1.csv"
 
+SPLITS_DIR = PROCESSED / "splits"
+SEQUENCES = SPLITS_DIR / "sequences.npz"
+SCALER_A = SPLITS_DIR / "scaler_model_a.json"
+SCALER_B = SPLITS_DIR / "scaler_model_b.json"
+SPLIT_DEFINITION = SPLITS_DIR / "split_definition.json"
+
+# Chronological split, fixed BEFORE any modelling (DS-02). Dates are the day t of the last input row.
+# Test = Oct 2025 .. end of data (~1 year). Do not change after model design starts.
+SPLIT_DATES = {
+    "train": ("2021-01-01", "2024-12-31"),
+    "validation": ("2025-01-01", "2025-09-30"),
+    "test": ("2025-10-01", "2026-08-30"),
+}
+SEQ_LEN = 14  # days of history per LSTM sample; identical for Model A and Model B (ML-05)
+
 ASSET = "BTC"
 EXTREME_MOVE_PCT = 10.0  # |daily return| above this is audited, never auto-corrected
 VADER_POS_THRESHOLD = 0.05  # standard VADER cut-offs for pos/neg/neutral

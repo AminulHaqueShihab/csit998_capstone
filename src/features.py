@@ -17,6 +17,31 @@ SENTIMENT_FEATURES = [
 ]
 WARMUP_DAYS = 30  # longest look-back window (sma_30)
 
+# Inputs actually fed to the models. Price *levels* (close, lags, SMAs) are left out: BTC trades at very
+# different levels across the study period, so a scaler fitted on 2021-2024 would see out-of-range values
+# in 2025-2026. Stationary ratios/returns are used instead. Sentiment *counts* are replaced by shares plus
+# log(article_count) so day-to-day volume differences and the 2024-01 export step weigh less.
+MODEL_PRICE_FEATURES = [
+    "return_1d", "log_return_1d", "close_over_sma_7", "close_over_sma_30", "momentum_7", "momentum_14",
+    "rsi_14", "volatility_14", "hl_range_pct", "volume_ratio_7", "log_volume",
+]
+MODEL_SENTIMENT_FEATURES = [  # VADER only (mandatory method); GDELT tone is an optional variant
+    "vader_mean", "vader_pos_share", "vader_neg_share", "log_article_count", "no_news_flag",
+]
+OPTIONAL_GDELT_FEATURES = ["gdelt_tone_mean"]
+BINARY_FEATURES = {"no_news_flag"}  # passed through unscaled
+
+
+def add_model_inputs(table: pd.DataFrame) -> pd.DataFrame:
+    """Row-wise (hence causal) transforms that build the model input columns from the modelling table."""
+    t = table.copy()
+    n = t["article_count"].where(t["article_count"] > 0)
+    t["vader_pos_share"] = (t["vader_pos_count"] / n).fillna(0.0)
+    t["vader_neg_share"] = (t["vader_neg_count"] / n).fillna(0.0)
+    t["log_article_count"] = np.log1p(t["article_count"])
+    t["log_volume"] = np.log(t["volume"])
+    return t
+
 
 def rsi(close: pd.Series, window: int = 14) -> pd.Series:
     delta = close.diff()

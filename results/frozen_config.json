@@ -1,0 +1,56 @@
+{
+  "frozen_before_test_evaluation": true,
+  "selection_rule": "LSTM: lowest mean validation loss over Models A and B and 3 seeds (one shared config). XGBoost: lowest validation log loss on price features. Threshold fixed at 0.5.",
+  "lstm": {
+    "max_epochs": 150,
+    "patience": 15,
+    "batch_size": 64,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "hidden": 32,
+    "layers": 1,
+    "dropout": 0.2,
+    "mean_val_loss": 0.6897404293219248
+  },
+  "xgboost": {
+    "max_depth": 3,
+    "learning_rate": 0.1,
+    "val_loss": 0.6878168058919383
+  },
+  "final_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+  ],
+  "tuning_seeds": [
+    0,
+    1,
+    2
+  ],
+  "seq_len": 14,
+  "split_dates": {
+    "train": [
+      "2021-01-01",
+      "2024-12-31"
+    ],
+    "validation": [
+      "2025-01-01",
+      "2025-09-30"
+    ],
+    "test": [
+      "2025-10-01",
+      "2026-08-30"
+    ]
+  },
+  "val_loss_by_lstm_model": {
+    "A": 0.68797,
+    "B": 0.69151
+  }
+}
