@@ -1,0 +1,19 @@
+{
+  "headlines": 250475,
+  "days": 2069,
+  "days_without_news": 17,
+  "label_agreement_vader_vs_finbert": 0.4994,
+  "headline_score_correlation": 0.3889,
+  "daily_mean_correlation": 0.7024,
+  "finbert_label_share": {
+    "neutral": 0.4971,
+    "positive": 0.2637,
+    "negative": 0.2392
+  },
+  "vader_label_share": {
+    "neutral": 0.4692,
+    "positive": 0.3131,
+    "negative": 0.2176
+  },
+  "output": "data/processed/daily_finbert.csv"
+}

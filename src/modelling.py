@@ -71,6 +71,29 @@ def paired_bootstrap_diff(y_true, proba_a, proba_b, metric="accuracy", n_boot=20
             "ci_excludes_zero": bool(lo > 0 or hi < 0), "n_boot": n_boot}
 
 
+def paired_block_bootstrap_diff(y_true, proba_a, proba_b, block: int, metric="accuracy", n_boot=2000, seed=0) -> dict:
+    """Like paired_bootstrap_diff but resamples blocks of consecutive days.
+
+    Needed for multi-day targets: neighbouring days share most of their outcome, so resampling single days
+    would understate the uncertainty. block = horizon in days.
+    """
+    y = np.asarray(y_true)
+    pa = (np.asarray(proba_a) >= THRESHOLD).astype(int)
+    pb = (np.asarray(proba_b) >= THRESHOLD).astype(int)
+    fn = {"accuracy": accuracy_score, "balanced_accuracy": balanced_accuracy_score}[metric]
+    n = len(y)
+    n_blocks = int(np.ceil(n / block))
+    rng = np.random.default_rng(seed)
+    diffs = np.empty(n_boot)
+    for i in range(n_boot):
+        starts = rng.integers(0, max(n - block + 1, 1), n_blocks)
+        idx = (starts[:, None] + np.arange(block)[None, :]).ravel()[:n]
+        diffs[i] = fn(y[idx], pb[idx]) - fn(y[idx], pa[idx])
+    lo, hi = np.percentile(diffs, [2.5, 97.5])
+    return {"point": float(fn(y, pb) - fn(y, pa)), "ci95_low": float(lo), "ci95_high": float(hi),
+            "ci_excludes_zero": bool(lo > 0 or hi < 0), "n_boot": n_boot, "block_days": block}
+
+
 # ------------------------------------------------------------------ LSTM
 
 class DirectionLSTM(nn.Module):

@@ -226,3 +226,5 @@ data/raw/gdelt/*.csv
 data/processed/news_clean.csv.gz
 data/processed/news_scored.csv.gz
 .DS_Store
+data/processed/news_finbert.csv.gz
+data/processed/finbert_parts/

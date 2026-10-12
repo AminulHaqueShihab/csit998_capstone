@@ -41,6 +41,8 @@ Missing files or columns stop a stage with a message naming the stage and the fi
 |---|---|---|
 | 6. Tune on validation only, freeze settings | `python -m src.tune` | `results/tuning_results.csv`, `results/frozen_config.json` |
 | 7. Train 10 seeds per model, evaluate on test once | `python -m src.evaluate_final` | `results/model_comparison.csv`, `results/final_results.json`, `results/test_predictions.csv`, `results/model_settings.json`, `models/*.pt` |
+| 8-10. Optional FinBERT experiment | `python -m src.score_finbert`, `python -m src.build_finbert_features`, `python -m src.evaluate_finbert` | `data/processed/daily_finbert.csv`, `results/finbert_results.json` |
+| 11. Extension: 3-day / weekly direction and large-move training (not the approved primary target) | `python -m src.evaluate_extensions` | `results/extension_results.json`, `results/extension_comparison.csv` |
 
 `evaluate_final` refuses to run without frozen settings and refuses a second run unless `--force` is given (the test set is evaluated once).
 

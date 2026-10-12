@@ -1,0 +1,15 @@
+{
+  "model": "ProsusAI/finbert",
+  "model_commit": null,
+  "device": "mps",
+  "scored_headlines": 250475,
+  "max_tokens": 64,
+  "label_counts": {
+    "neutral": 124509,
+    "positive": 66060,
+    "negative": 59906
+  },
+  "score_mean": 0.03787943348288536,
+  "note": "Device and library versions can change the 6th decimal of probabilities, rarely a label.",
+  "output": "data/processed/news_finbert.csv.gz"
+}

@@ -1,0 +1,161 @@
+{
+  "reruns": 0,
+  "seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109
+  ],
+  "lstm_hyperparameters_frozen": {
+    "max_epochs": 150,
+    "patience": 15,
+    "batch_size": 64,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "hidden": 32,
+    "layers": 1,
+    "dropout": 0.2,
+    "mean_val_loss": 0.6897404293219248
+  },
+  "xgboost_hyperparameters_frozen": {
+    "max_depth": 3,
+    "learning_rate": 0.1,
+    "val_loss": 0.6878168058919383
+  },
+  "features": [
+    "return_1d",
+    "log_return_1d",
+    "close_over_sma_7",
+    "close_over_sma_30",
+    "momentum_7",
+    "momentum_14",
+    "rsi_14",
+    "volatility_14",
+    "hl_range_pct",
+    "volume_ratio_7",
+    "log_volume",
+    "finbert_mean",
+    "finbert_pos_share",
+    "finbert_neg_share",
+    "log_article_count",
+    "no_news_flag"
+  ],
+  "finbert_model": "ProsusAI/finbert",
+  "results": {
+    "lstm_b_finbert": {
+      "test": {
+        "accuracy_mean": 0.4853293413173653,
+        "balanced_accuracy_mean": 0.48541487223657764,
+        "precision_mean": 0.4664505353364533,
+        "recall_mean": 0.4882716049382717,
+        "f1_mean": 0.4654656740766653,
+        "accuracy_std": 0.012377261442272105,
+        "balanced_accuracy_std": 0.013801612166370136,
+        "precision_std": 0.017968625210719024,
+        "recall_std": 0.15933699892281075,
+        "f1_std": 0.09166545388002871,
+        "accuracy_ensemble": 0.47904191616766467,
+        "balanced_accuracy_ensemble": 0.476959517657192,
+        "precision_ensemble": 0.4583333333333333,
+        "recall_ensemble": 0.4074074074074074,
+        "f1_ensemble": 0.43137254901960786
+      },
+      "validation_ensemble": {
+        "accuracy": 0.5238095238095238,
+        "balanced_accuracy": 0.5252603887039622,
+        "precision": 0.5391304347826087,
+        "recall": 0.4460431654676259,
+        "f1": 0.4881889763779528,
+        "tn": 81,
+        "fp": 53,
+        "fn": 77,
+        "tp": 62
+      },
+      "validation_log_loss_ensemble": 0.6885925214070796,
+      "confusion_ensemble_test": {
+        "tn": 94,
+        "fp": 78,
+        "fn": 96,
+        "tp": 66
+      }
+    },
+    "xgboost_finbert_extra": {
+      "test": {
+        "accuracy_mean": 0.47245508982035933,
+        "balanced_accuracy_mean": 0.47015144989951196,
+        "precision_mean": 0.44768033806568264,
+        "recall_mean": 0.3932098765432099,
+        "f1_mean": 0.41364481944060766,
+        "accuracy_std": 0.013837389231486643,
+        "balanced_accuracy_std": 0.013591530916970771,
+        "precision_std": 0.01830129591328649,
+        "recall_std": 0.08686174450315502,
+        "f1_std": 0.06495107072188196,
+        "accuracy_ensemble": 0.45808383233532934,
+        "balanced_accuracy_ensemble": 0.45661068044788977,
+        "precision_ensemble": 0.4370860927152318,
+        "recall_ensemble": 0.4074074074074074,
+        "f1_ensemble": 0.4217252396166134
+      },
+      "validation_ensemble": {
+        "accuracy": 0.5201465201465202,
+        "balanced_accuracy": 0.5220659293460754,
+        "precision": 0.5370370370370371,
+        "recall": 0.4172661870503597,
+        "f1": 0.46963562753036436,
+        "tn": 84,
+        "fp": 50,
+        "fn": 81,
+        "tp": 58
+      },
+      "validation_log_loss_ensemble": 0.6896936906590327,
+      "confusion_ensemble_test": {
+        "tn": 87,
+        "fp": 85,
+        "fn": 96,
+        "tp": 66
+      }
+    }
+  },
+  "comparisons_ensemble_bootstrap": {
+    "finbert_B_minus_price_only_A": {
+      "accuracy": {
+        "point": -0.020958083832335328,
+        "ci95_low": -0.053967065868263504,
+        "ci95_high": 0.011976047904191656,
+        "ci_excludes_zero": false,
+        "n_boot": 2000
+      },
+      "balanced_accuracy": {
+        "point": -0.02124605225380427,
+        "ci95_low": -0.055994548990130205,
+        "ci95_high": 0.01286902128651149,
+        "ci_excludes_zero": false,
+        "n_boot": 2000
+      }
+    },
+    "finbert_B_minus_vader_B": {
+      "accuracy": {
+        "point": -0.0059880239520958,
+        "ci95_low": -0.04191616766467071,
+        "ci95_high": 0.030014970059879898,
+        "ci_excludes_zero": false,
+        "n_boot": 2000
+      },
+      "balanced_accuracy": {
+        "point": -0.005993396497272485,
+        "ci95_low": -0.04305079666054706,
+        "ci95_high": 0.03179770452833764,
+        "ci_excludes_zero": false,
+        "n_boot": 2000
+      }
+    }
+  },
+  "note": "Secondary, pre-declared experiment on the same test period as the main result; settings were not re-tuned for FinBERT. Differences inside the 95% interval are not evidence of improvement."
+}

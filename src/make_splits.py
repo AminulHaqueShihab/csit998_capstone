@@ -63,27 +63,36 @@ def make_windows(values: np.ndarray, seq_len: int):
     return X, end
 
 
-def build(table: pd.DataFrame, seq_len: int = config.SEQ_LEN):
+def windows_for(t: pd.DataFrame, cols, seq_len: int):
+    """Scaler (train rows only) + windows for one feature set. Returns (X per split, scaler, window meta)."""
+    scaler = fit_scaler(t[t["split"] == "train"], cols)
+    X_all, end = make_windows(apply_scaler(t, scaler), seq_len)
+    meta = t.iloc[end].reset_index(drop=True)  # day t, split and target for each window
+    by_split = {name: X_all[(meta["split"] == name).to_numpy()] for name in config.SPLIT_DATES}
+    return by_split, scaler, meta
+
+
+def prepare_table(table: pd.DataFrame) -> pd.DataFrame:
     table = table.sort_values("date").reset_index(drop=True)
     gaps = table["date"].diff().dropna()
     if (gaps != pd.Timedelta(days=1)).any():
         raise PipelineError("[make_splits] modelling table has missing calendar days; windows would span a gap")
     t = features.add_model_inputs(table)
     t["split"] = split_of(t["date"])
+    return t
 
+
+def build(table: pd.DataFrame, seq_len: int = config.SEQ_LEN):
+    t = prepare_table(table)
     cols_a = features.MODEL_PRICE_FEATURES
     cols_b = features.MODEL_PRICE_FEATURES + features.MODEL_SENTIMENT_FEATURES
-    train_rows = t[t["split"] == "train"]
-    scaler_a, scaler_b = fit_scaler(train_rows, cols_a), fit_scaler(train_rows, cols_b)
-
-    Xa_all, end = make_windows(apply_scaler(t, scaler_a), seq_len)
-    Xb_all, _ = make_windows(apply_scaler(t, scaler_b), seq_len)
-    meta = t.iloc[end].reset_index(drop=True)  # day t, split and target for each window
+    xa, scaler_a, meta = windows_for(t, cols_a, seq_len)
+    xb, scaler_b, _ = windows_for(t, cols_b, seq_len)
 
     arrays, tabular = {}, {}
     for name in config.SPLIT_DATES:
         m = (meta["split"] == name).to_numpy()
-        arrays[f"X_a_{name}"], arrays[f"X_b_{name}"] = Xa_all[m], Xb_all[m]
+        arrays[f"X_a_{name}"], arrays[f"X_b_{name}"] = xa[name], xb[name]
         arrays[f"y_{name}"] = meta.loc[m, "target_direction"].to_numpy(dtype="int64")
         arrays[f"dates_{name}"] = meta.loc[m, "date"].dt.strftime("%Y-%m-%d").to_numpy().astype("U10")
         tabular[name] = meta[m]

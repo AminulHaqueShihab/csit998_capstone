@@ -29,6 +29,9 @@ MODEL_SENTIMENT_FEATURES = [  # VADER only (mandatory method); GDELT tone is an 
     "vader_mean", "vader_pos_share", "vader_neg_share", "log_article_count", "no_news_flag",
 ]
 OPTIONAL_GDELT_FEATURES = ["gdelt_tone_mean"]
+# SF-03: same structure as the VADER features, scored by FinBERT instead (same items, dates and aggregation)
+FINBERT_SENTIMENT_FEATURES = ["finbert_mean", "finbert_pos_share", "finbert_neg_share", "log_article_count",
+                              "no_news_flag"]
 BINARY_FEATURES = {"no_news_flag"}  # passed through unscaled
 
 
