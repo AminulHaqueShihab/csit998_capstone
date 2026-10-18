@@ -1,8 +1,4 @@
-"""Stage 9 (optional, SF-03): aggregate FinBERT headline scores to one row per UTC day.
-
-Uses exactly the headlines, dates and aggregation rules of the VADER features (src.build_sentiment):
-mean score, positive / negative / neutral counts, article count; zero-news days are explicit.
-Also reports how closely VADER and FinBERT agree (descriptive).
+"""Stage 9: aggregate FinBERT headline scores to one row per UTC day.
 
 Run: python -m src.build_finbert_features
 """

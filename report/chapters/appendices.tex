@@ -1,0 +1,119 @@
+\section{Implementation and Reproduction}
+\label{app:repro}
+\subsection{Layout and execution order}
+The repository contains \code{src/}, \code{tests/}, \code{data/}, \code{reports/}, \code{results/}, \code{models/}, \code{docs/}, \code{report/} and \code{web/} folders. Each Python stage reads the output of the preceding one. From the repository root, after installing the pinned packages listed in \code{requirements.txt}, the sequence is:
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize,backgroundcolor=\color{codegray},breaklines=true,frame=single]
+python -m src.prepare_price
+python -m src.prepare_news
+python -m src.build_sentiment
+python -m src.build_modelling_table
+python -m src.make_splits
+python -m src.tune
+python -m src.evaluate_final
+# secondary analyses
+python -m src.score_finbert
+python -m src.build_finbert_features
+python -m src.evaluate_finbert
+python -m src.evaluate_extensions
+python -m src.lag_analysis
+python -m src.walk_forward
+# figures, demo data and tests
+python -m src.make_report_figures
+python -m src.export_demo_data
+pytest -q
+# web interface
+cd web && pnpm install && pnpm test && pnpm build
+\end{lstlisting}
+
+The main evaluator requires a frozen configuration and refuses a second run unless an explicit force flag is supplied. The extension, FinBERT and walk-forward scripts follow the same rule. These guards exist to prevent tuning against the test score.
+
+\subsection{Data and result fingerprints}
+The final results record SHA-256 fingerprints of the modelling table, the saved sequences and the processed price file:
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize,backgroundcolor=\color{codegray},breaklines=true,frame=single]
+modelling_table_v1.csv
+c4d946539b93a237d902a6609fd32c63cdccba31dd70089b226140f078aae12b
+sequences.npz
+97df12e1a2c48c277ba17bebdaad06b7841ce012ade586321b2842abb13a123a
+btcusdt_1d_clean.csv
+ae28258b7e5bc319591dc3edc23240411765e6d2c0477bf358e6e089e4c8b36c
+\end{lstlisting}
+The fingerprints of the two raw GDELT exports appear in Table~\ref{tab:hashes}.
+
+Model weights are stored in \code{models/}, one file per seed (100 to 109) and model variant, with names such as the following.
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize,backgroundcolor=\color{codegray},breaklines=true,frame=single]
+lstm_a_price_only_seed100.pt
+\end{lstlisting} The results folder keeps the predictions and per-seed metrics, so that the evaluation figures can be redrawn without retraining.
+
+\subsection{Levels of reproducibility}
+Reproducibility can be stated at three levels. At the code level, the methods exist as executable files. At the processed-data level, a user can rerun the modelling from the saved features and outputs. At the source-data level, the original exports, matching queries and permission to use them are also required. The repository supports the first two. The raw GDELT files contain publishers' text and are not distributed. A rebuild from raw data therefore requires the two exports to be queried again (the 2021--2023 SQL is given in \code{docs/}) under their usage terms.
+
+\section{Definitions}
+\label{app:definitions}
+\subsection{Market and article definitions}
+The daily market record is the Binance one-day BTCUSDT candle in UTC, identified by its opening time. The simple return is $r_t=C_t/C_{t-1}-1$ and the target is $y_t=\mathbb{1}(C_{t+1}>C_t)$. When two consecutive closes are equal the target is 0. There is no separate class for an unchanged price.
+
+A retained article is an eligible, deduplicated GDELT headline whose availability date falls on the given UTC day. The daily article count is the number of such records and not the number of stories published anywhere. Positive and negative shares divide the category counts by that retained count, and no-news days carry their own flag, so that a missing input is not read as a neutral mood.
+
+\subsection{Classification metrics}
+With the up class taken as positive,
+\begin{align}
+\mathrm{Accuracy} &= \frac{TP+TN}{TP+TN+FP+FN},\\
+\mathrm{Precision} &= \frac{TP}{TP+FP},\qquad
+\mathrm{Recall} = \frac{TP}{TP+FN},\\
+\mathrm{Specificity} &= \frac{TN}{TN+FP},\qquad
+\mathrm{BalancedAcc} = \frac{\mathrm{Recall}+\mathrm{Specificity}}{2},\\
+F_1 &= \frac{2\,\mathrm{Precision}\,\mathrm{Recall}}{\mathrm{Precision}+\mathrm{Recall}}.
+\end{align}
+These measures are standard \cite{sokolova2009,brodersen2010}. A model that never predicts a rise has an undefined precision. The scikit-learn implementation sets it to zero, so that recall and F1 are also zero, which is why the majority rule can show 51.50\% accuracy together with zero F1. Log loss for probabilities $p_i$ is
+\begin{equation}
+L=-\frac{1}{n}\sum_{i=1}^{n}\left[y_i\log p_i+(1-y_i)\log(1-p_i)\right],
+\end{equation}
+and it uses the full probability, which makes it more sensitive to overconfidence than thresholded accuracy. The area under the ROC curve, used in the feature screening, equals the probability that a randomly chosen up day receives a higher feature value than a randomly chosen not-up day \cite{fawcett2006}.
+
+\subsection{Uncertainty methods}
+\textbf{Paired bootstrap (single split).} The script draws 334 test-day indices with replacement and computes each model's metric on the drawn days. It subtracts the Model A value from the Model B value and repeats the procedure 2,000 times with a fixed seed \cite{efron1993}. The 2.5th and 97.5th percentiles give the interval. Pairing keeps both models on identical resampled days.
+
+\textbf{Block bootstrap (multi-day and walk-forward).} The same procedure resamples blocks of consecutive days \cite{kunsch1989}. The block length is seven days for the pooled walk-forward results and equal to the horizon for the multi-day tasks. Neighbouring days share outcomes or have correlated errors, so block resampling gives a more realistic interval. A stationary variant with random block lengths is also available \cite{politis1994}.
+
+\textbf{Circular-shift permutation test (lag analysis).} For each sentiment measure and lag, one series is rotated by a random offset 5,000 times while the other remains fixed. This preserves the autocorrelation of both series and breaks any genuine association between them, in the manner of surrogate-data tests \cite{theiler1992}. The $p$-value is the proportion of rotations whose correlation is at least as large in magnitude as the observed one. With 132 tests the Bonferroni threshold is $0.05/132\approx0.00038$ \cite{dunn1961}.
+
+\textbf{Guessing band.} For $n$ independent days, a model without skill has a 95\% accuracy band of $50\%\pm1.96\sqrt{0.25/n}$, which is $\pm5.4$ points for 334 days and $\pm2.7$ for 1,338. For $h$-day targets $n$ is divided by $h$, since overlapping outcomes carry less independent information.
+
+\section{Requirements Traceability}
+\label{app:trace}
+\subsection{Requirements and supporting evidence}
+The table maps the principal requirements of the September requirements draft to the evidence in the repository.
+
+\begin{longtable}{p{2.5cm}p{4.0cm}p{7.0cm}}
+\caption{Requirements and supporting evidence}\label{tab:trace}\\
+\toprule
+Requirement & Intent & Evidence\\\midrule\endfirsthead
+\toprule
+Requirement & Intent & Evidence\\\midrule\endhead
+DR-01 & Daily BTC coverage & 68 Binance monthly archives; 2,069 verified daily records\\
+DR-03/04 & Raw preservation and provenance & Raw files kept read-only; source register and data dictionary in \code{docs/}; hashes in Section~\ref{ch:governance}; the exact query for the 2024--2026 export was not saved\\
+DR-05 & Historical news & 540,518 raw records in two exports; 250,475 retained after cleaning; raw headline files not distributed\\
+DQ-01 to DQ-06 & Timestamps, OHLCV checks, duplicates, outliers, relevance & Price and news quality reports; 24 extreme days reviewed and kept; relevance and duplicate counts in Table~\ref{tab:newsdrops}\\
+SF-01/02 & VADER scoring and daily aggregation & \code{src/build_sentiment.py}; daily table with explicit no-news days\\
+SF-03 & FinBERT repeat & \code{src/score_finbert.py} and \code{src/evaluate_finbert.py}; 250,475 headlines scored\\
+PF-01/02 & Causal features, train-only scaling & \code{src/features.py}, \code{src/make_splits.py}, saved scaler files, unit tests\\
+TP-01 to TP-03 & UTC cutoff, next-day label, one-day lag & Availability rule and cutoff check in code; tests for target and alignment\\
+DS-01 to DS-03 & Modelling table, chronological split, untouched test & Versioned table with data dictionary; split frozen before tuning; evaluation guard\\
+ML-01 to ML-06 & Baselines, matched models, validation-only selection & Majority rule, XGBoost, LSTM A and B with shared settings; frozen configuration\\
+EV-01 to EV-04 & Metrics, comparison, sentiment effect, limitations & Section~\ref{ch:results} tables; intervals; seed spread; Section~\ref{ch:discussion}\\
+EX-01 & Feature and lag analysis without causal claims & \code{src/lag_analysis.py}; lead and lag section of Section~\ref{ch:results}\\
+EX-02 & SHAP explanations (could) & Not implemented\\
+DR-02, UI-04 & Ethereum extension (should) & Not implemented\\
+DR-06, UI-06 & Reddit and live price (could) & Not implemented\\
+UI-01 to UI-03, UI-05 & Interface from saved results, trends, predicted versus actual, disclaimer & \code{web/} application (Section~\ref{ch:demo})\\
+NF-04/05 & Readability and load time & Plain-language labels; the page loads from about 460 KB of saved files\\
+SW-01 to SW-05 & Repository, instructions, separated stages, credentials, saved settings & Repository layout and README; one script per stage; credential scan of the working tree; settings and hashes saved\\
+SW-06 & Rerun by a second person & Commands and fingerprints documented in Appendix~\ref{app:repro}; a rerun by a team member who did not build the models was not recorded\\
+NF-01/02 & Clear failure; fixed versions & Stage errors name the failing stage; package and data versions recorded\\
+NF-03 & Ethics and sharing limits & Section~\ref{ch:governance}\\
+\bottomrule
+\end{longtable}
+
+\subsection{Proposal and delivered scope}
+The June proposal described a wide study: Bitcoin and Ethereum, Twitter and Reddit, several sentiment classifiers, GRU, bidirectional, CNN-LSTM and attention models, ARIMA and regression metrics. During development the scope was narrowed to BTCUSDT, GDELT news and next-day direction. The delivered work comprises a price-only LSTM, a VADER LSTM, FinBERT runs, XGBoost, a majority baseline, extension tasks, a walk-forward evaluation, a lag analysis and a web interface. The remaining ideas of the proposal are not part of the delivered work.

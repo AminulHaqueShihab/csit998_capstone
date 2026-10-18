@@ -1,0 +1,79 @@
+\section{Model Training}
+\label{ch:training}
+\subsection{Objective and models}
+Each model outputs a probability $\hat p_t=P(y_t=1\mid X_t)$, and a rise is predicted when $\hat p_t\geq0.5$. The threshold was fixed before any evaluation and was never tuned. Training minimises binary cross-entropy, which penalises a confident wrong answer more heavily than a hesitant one.
+
+Model A is a price-only LSTM. Model B has the same structure with the daily VADER features added, and the FinBERT version of Model B replaces the sentiment block and nothing else. XGBoost provides a tabular comparison, and the naive baseline predicts the training majority class on every day. The networks were implemented in PyTorch \cite{paszke2019}, the tree models with XGBoost \cite{chen2016}, and the metrics, scaling and utilities with scikit-learn, NumPy and pandas \cite{pedregosa2011,harris2020,mckinney2010}.
+
+\subsection{LSTM architecture}
+The network is small by design. It has one LSTM layer with 32 hidden units, a dropout layer \cite{srivastava2014} and a linear output passed through a sigmoid. If $h_{14}$ is the final hidden state after the 14-step window, then
+\begin{equation}
+\hat p_t=\sigma(Wh_{14}+b), \qquad \sigma(u)=\frac{1}{1+e^{-u}}.
+\end{equation}
+A bidirectional or attention-based model might fit the training years more closely, but it would add capacity and tuning freedom to a sample of 1,418 overlapping windows. A model that can be explained was preferred.
+
+Training uses the Adam optimiser \cite{kingma2015}, gradient clipping at a norm of 1.0 \cite{pascanu2013}, mini-batches of 64 and a weight decay of $10^{-4}$. The weights with the best validation loss are kept, and training stops after 15 epochs without improvement. One detail is easily misreported. With a single recurrent layer, the dropout argument of the LSTM module has no effect, so the 0.2 dropout comes entirely from the explicit layer applied to the final hidden state.
+
+\subsection{Selection and freezing of settings}
+Twelve LSTM configurations were compared (16, 32 or 64 hidden units, one or two layers, dropout 0.2 or 0.4), each with both models and three seeds, using validation loss only. The configuration with the lowest mean validation loss over Models A and B was chosen, so both share one final set-up. XGBoost was tuned separately over six settings using validation log loss. The choices were written to file before the test days were used.
+
+\begin{table}[htbp]\centering\small
+\caption{Frozen primary settings}\label{tab:hyperparams}
+\begin{tabularx}{\textwidth}{p{4.1cm}X}
+\toprule
+Setting & Value\\\midrule
+Input history & 14 UTC days\\
+Recurrent layers / hidden units & 1 / 32\\
+Dropout & 0.20 (explicit, on the final hidden state)\\
+Optimiser / learning rate & Adam / 0.001\\
+Weight decay & $10^{-4}$\\
+Batch size / maximum epochs & 64 / 150\\
+Early-stopping patience & 15 epochs\\
+Gradient clipping & Maximum norm 1.0\\
+Final seeds & 100 to 109 (ten runs)\\
+Probability threshold & 0.50\\
+XGBoost depth / learning rate & 3 / 0.10\\
+XGBoost other controls & Up to 500 trees, early stopping after 30, row and column subsampling 0.8, minimum child weight 5, L2 penalty 5\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The selected mean validation losses were 0.6897 for the LSTM and 0.6878 for XGBoost. Both lie just below $\ln 2 = 0.6931$, the loss of a model that always predicts 50\%. This was taken as an early indication that the features carry little signal, and the test results later agreed. The final LSTMs were retrained with ten seeds, and the ensemble prediction for each day is the arithmetic mean of the ten probabilities and not a vote. Reporting several seeds follows the recommendation that variance across random initialisations should be accounted for when models are compared \cite{bouthillier2021}.
+
+\subsection{Baselines and controlled alternatives}
+The naive rule is learned from the training labels alone. The training set contains 704 up days out of 1,418, so its majority class is ``not up'', and it predicts that class on every day. The rule is trivial, yet it answers an important question: whether additional modelling improves on the simplest rule fitted to the same data.
+
+XGBoost receives the engineered features of the last day as a flat row and not a fourteen-step sequence, so it is not a clean ablation of the LSTM. Its purpose is to test whether recurrence is worthwhile. An XGBoost with VADER features is also reported as an additional comparison.
+
+The FinBERT models use the same headlines and test dates and inherit the frozen settings. No re-tuning was performed for FinBERT. This keeps the substitution interpretable, although it also means that FinBERT did not receive its own best hyperparameters.
+
+\subsection{Protecting the test set}
+Validation days select the settings and stop training early, and the test days appear once, in the final comparison. The evaluation script refuses to run without a frozen configuration and refuses a second run unless an explicit force flag is supplied. The saved result records zero reruns of the main test.
+
+This does not cover every case. The FinBERT, extension and walk-forward analyses reuse the same later period, and they are therefore reported as secondary results alongside the primary one and never in its place. Averaging ten seeds indicates the sensitivity to random initialisation. It does not provide ten independent tests of the underlying hypothesis, because all ten train on the same market history.
+
+\subsection{Saved artefacts}
+\begin{table}[htbp]\centering\small
+\caption{Files linking training to the reported results}\label{tab:artifacts}
+\begin{tabularx}{\textwidth}{p{7.8cm}X}
+\toprule
+File or folder & Purpose\\\midrule
+\code{src/make_splits.py} & Dated splits, scalers and 14-day windows\\
+\code{results/frozen_config.json} & Validation-selected settings and seed lists\\
+\code{results/model_settings.json} & Final features, package versions, dates and data hashes\\
+\code{models/*.pt} & Ten weight files for each LSTM variant\\
+\code{results/test_predictions.csv} & The 334 test-day predictions of the primary models\\
+\code{results/test_metrics_per_seed.csv} & Per-seed test metrics and confusion counts\\
+\code{results/final_results.json} & Primary ensemble comparisons and intervals\\
+\code{results/finbert_results.json} & FinBERT comparison\\
+\code{results/extension_results.json} & Other horizons and large-move tasks\\
+\code{results/walk_forward/} & Eight-period walk-forward results and predictions\\
+\code{results/lag_analysis/} & Lag correlations, quintile and feature tables\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The run recorded Python 3.13.15 with pinned versions of PyTorch, XGBoost, scikit-learn, NumPy and pandas, and the repository includes a \code{requirements.txt} and a step-by-step README. The stored predictions allow the analysis to be repeated from the processed data without retraining the networks.
+
+\subsection{Limits of the training stage}
+Fixed-window classifiers were trained on historical data. No continuously adapting system, reinforcement-learning agent, trading strategy or live predictor was built. The ARIMA, GRU, CNN-LSTM and multi-asset branches of the proposal were not completed, and nothing in this report should be read as covering them.

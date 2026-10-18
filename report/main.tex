@@ -1,0 +1,122 @@
+%\documentclass[runningheads]{llncs}
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsfonts,amssymb,amsmath}
+\usepackage{plain}
+\setcounter{tocdepth}{3}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{multicol}
+\usepackage{textcomp,booktabs}
+\usepackage{graphicx,booktabs,multirow}
+\usepackage{booktabs}
+\usepackage{array,tabularx,longtable}
+\usepackage{enumitem}
+\newsavebox{\tablebox}
+\usepackage{times}
+\usepackage{cite}
+\usepackage{tocloft}
+\setlength{\cftbeforesecskip}{0.8ex}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsecpagefont}{\bfseries}
+\setlength{\cftsecindent}{0em}\setlength{\cftsecnumwidth}{2em}
+\setlength{\cftsubsecindent}{2em}\setlength{\cftsubsecnumwidth}{2.6em}
+\setlength{\cftsubsubsecindent}{4.6em}\setlength{\cftsubsubsecnumwidth}{3.4em}
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsubsecfont}{\small\itshape}
+\renewcommand{\cftsubsubsecpagefont}{\small}
+\usepackage{hyperref}
+\usepackage{ulem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!50!black}
+
+\topmargin -0.5cm \oddsidemargin 0cm \evensidemargin 0cm \textheight
+23cm \textwidth 16cm
+
+\renewcommand{\baselinestretch}{1.0}
+
+\newcommand{\tb}{\textcolor{blue}}
+\newcommand{\tr}{\textcolor{red}}
+
+% colours, helpers and figure macro used in the body of the report
+\definecolor{uowblue}{RGB}{14,57,93}
+\definecolor{softblue}{RGB}{229,238,245}
+\definecolor{codegray}{RGB}{246,247,248}
+\graphicspath{{figures/}}
+\newcommand{\code}[1]{{\ttfamily\small\detokenize{#1}}}
+\newcommand{\figurewide}[4][0.92]{\begin{figure}[htbp]\centering\includegraphics[width=#1\textwidth]{#2}\caption{#3}\label{#4}\end{figure}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{2.5cm}
+{\large University of Wollongong}\\[0.3cm]
+{\large CSIT998 Professional Capstone Project}\\[0.2cm]
+{\large Group 16}\\[1.2cm]
+\rule{\textwidth}{0.6pt}\\[0.6cm]
+{\LARGE\bfseries Cryptocurrency Price-Direction Prediction\\[0.2cm] Using LSTM Models and Media Sentiment Analysis\par}
+\vspace{0.6cm}
+\rule{\textwidth}{0.6pt}\\[1.4cm]
+{\large\bfseries Authors}\\[0.4cm]
+{\normalsize
+\begin{tabular}{lll}
+Nguyen Gia Long & 8920576 & gln767@uowmail.edu.au\\[2pt]
+Md Aminul Haque & 8928022 & mah836@uowmail.edu.au\\[2pt]
+Pius Kalambe & 9751579 & pk673@uowmail.edu.au\\[2pt]
+Almas Ashrafi & 8923024 & aa4903@uowmail.edu.au
+\end{tabular}\par}
+\vspace{1.2cm}
+{\large\bfseries Supervisor}\\[0.3cm]
+{\normalsize Wanqing Li}\\[2cm]
+{\normalsize October 2026}
+\end{titlepage}
+
+\pagenumbering{roman}
+\begin{abstract}
+Predicting whether Bitcoin will close higher tomorrow is difficult, and it is unclear whether news sentiment adds information beyond prices. This project tests the question with 2,069 daily BTCUSDT observations from Binance (January 2021 to August 2026) and 250,475 cleaned Bitcoin headlines from GDELT. A price-only LSTM is compared with an LSTM that also receives daily VADER sentiment, using a 14-day window, one frozen configuration and ten random seeds. On 334 untouched test days, the price-only ensemble was correct on 50.0\% of days, the VADER version on 48.5\%, and a rule that always predicts ``not up'' on 51.5\%. The 1.5-point gap has a 95\% bootstrap interval of $-5.7$ to $+2.4$ points, and FinBERT sentiment led to the same conclusion. An eight-period walk-forward evaluation over 1,338 days agreed, with no reliable sentiment effect. A lag analysis suggests why: FinBERT sentiment correlates 0.45 with the previous day's return and about zero with the next day's, so headlines mostly describe moves that have already happened. A web interface replays the saved predictions against the actual price. The main contribution is a transparent, reproducible evaluation of a near-chance result.
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\listoffigures
+\listoftables
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage\pagenumbering{arabic}
+\input{chapters/01_introduction}
+\input{chapters/02_literature}
+\input{chapters/03_methodology}
+\input{chapters/04_data_collection}
+\input{chapters/05_governance}
+\input{chapters/06_model_preparation}
+\input{chapters/07_model_training}
+\input{chapters/08_results}
+\input{chapters/09_benchmarking}
+\input{chapters/10_demo_interface}
+\input{chapters/11_discussion}
+\input{chapters/12_future_work}
+\input{chapters/13_conclusion}
+
+\section*{AI Usage Disclosure}
+\addcontentsline{toc}{section}{AI Usage Disclosure}
+
+Generative AI (Claude and ChatGPT ) was used for  researching, grammar checking, formatting, and wording refinement. All project ideas, the experimental design, methodology, analysis and final content were formulated, reviewed, and verified by the project team.
+
+\addcontentsline{toc}{section}{References}
+\input{chapters/bibliography}
+
+\appendix
+\input{chapters/appendices}
+
+\end{document}

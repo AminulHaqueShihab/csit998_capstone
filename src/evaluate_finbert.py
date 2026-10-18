@@ -1,9 +1,4 @@
-"""Stage 10 (optional, SF-03): Model B with FinBERT sentiment instead of VADER.
-
-Controlled repeat of the main experiment: same headlines, dates, split, 14-day window, scaler rule, frozen
-LSTM / XGBoost settings (NOT re-tuned) and 10 seeds. Only the sentiment source changes.
-Declared before running: this is a secondary experiment on the same test period, so it is reported next to
-(and never replaces) the main result; a re-run needs --force.
+"""Stage 10: repeat the main experiment with FinBERT instead of VADER (secondary result).
 
 Run: python -m src.evaluate_finbert
 """

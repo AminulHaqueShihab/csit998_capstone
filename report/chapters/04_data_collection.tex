@@ -1,0 +1,61 @@
+\section{Data Collection}
+\label{ch:data}
+\subsection{Sources and study period}
+Two sources were used. Binance Data Vision supplies BTCUSDT spot candles, and the GDELT Global Knowledge Graph supplies timestamped Bitcoin headlines \cite{binancepublic,leetaru2013,gdeltdata}. The two are complementary. The Binance archive is complete, structured and available at daily resolution. GDELT has broad historical coverage, but its headlines are multilingual and their timestamps require interpretation.
+
+The study period runs from 1 January 2021 to 31 August 2026, which is 2,069 UTC days. The project requirements specified an end date of May 2025. Because both sources contained data well beyond that date, the window was extended by about fifteen months. The additional history is useful, but it also means that the final end date differs from the original plan, a point returned to in Section~\ref{ch:governance}.
+
+\subsection{Binance prices}
+The price data consist of 68 monthly ZIP archives of one-day BTCUSDT candles, each accompanied by a SHA-256 checksum file. All 68 checksums matched. The files carry no header, so the code assigns column names, converts values to numeric types and expresses every time in UTC. It also handles a change in the archives. From 2025 Binance recorded timestamps in microseconds instead of milliseconds, and a parser that ignored this would date those days tens of thousands of years in the future.
+
+The cleaned table contains 2,069 rows, one per day, with no duplicate and no missing dates. Checks for positive prices, consistent high and low values and non-negative volume rejected no records. Twenty-four days on which the close changed by at least 10\% were reviewed individually. They correspond to identifiable events, such as the 14.4\% fall on 19 May 2021 and the 14.1\% fall on 9 November 2022 during the collapse of FTX, and were retained. Removing genuine crashes would make the data easier to model and the results less representative.
+
+\figurewide{btc_history.pdf}{BTCUSDT daily close over the study period. Shading marks the validation and test periods.}{fig:history}
+
+A single exchange and trading pair cannot represent the whole market. BTCUSDT is quoted in Tether, and prices on other venues may diverge during periods of stress. This restricts the setting to which the conclusions apply but does not affect the comparison between the models.
+
+\subsection{GDELT headlines}
+GKG 2.1 records were retrieved through Google BigQuery. The query keeps any record whose headline contains ``bitcoin'' or ``btc'', irrespective of case. Two exports cover the period. The 2021--2023 export contains 279,049 records and was extracted on 4 October 2026, scanning approximately 223~GB within BigQuery's free tier. The 2024--August 2026 export contains 261,469 records and was supplied from the team's first collection round. In total there are 540,518 raw records.
+
+The exact SQL used for the second export was not preserved. A close equivalent was therefore reconstructed and compared with the delivered file for one month. For January 2024 the reconstructed query returns 17,486 rows against 16,780 in the delivered file, about 4\% more, which suggests that the original filter was slightly narrower. Because the reconstruction is at present the only version of that query that can be executed, the 4\% gap is a measured difference and not an established cause. It is relevant later because it probably accounts for a step in headline volume at the join between the two files.
+
+Each record carries a GDELT batch timestamp, a precise publication time where one exists, the headline, URL, source, a translation flag and the \code{V2Tone} descriptor \cite{gdelttone}. \code{V2Tone} contains seven values: tone, positive and negative scores, polarity, activity density, self or group density and word count. These are GDELT's own measures and were not combined with VADER's compound score.
+
+\subsection{Cleaning the headlines}
+The cleaning code decodes HTML character references (twice where titles are doubly encoded), normalises Unicode, collapses whitespace and removes tracking parameters from URLs. It then discards headlines shorter than ten characters, machine-translated sources, text that a language detector confidently labels as non-English, and records that do not mention Bitcoin as a whole word. Duplicates are removed last, first by canonical URL and then by same-day normalised headline. VADER is an English lexicon, so non-English coverage was sacrificed to keep the sentiment measure consistent. The cost is substantial, since a large share of the global discussion is excluded.
+
+Two steps account for most of the reduction. Removing machine-translated sources eliminated 208,998 headlines, and same-day duplicates removed a further 73,169. Table~\ref{tab:newsdrops} lists every step by period. Same-day duplicates were removed because syndicated stories would otherwise be counted many times and inflate the article volume.
+
+\begin{table}[htbp]\centering\small
+\caption{Headline accounting by period. The 2024--2026 column is the full-period figure minus the 2021--2023 figure.}\label{tab:newsdrops}
+\begin{tabularx}{\textwidth}{Xrrr}
+\toprule
+Step & 2021--2023 & 2024--2026 & Full period\\\midrule
+Raw GDELT records & 279,049 & 261,469 & 540,518\\
+Empty or very short headline & 29 & 20 & 49\\
+Machine-translated source & 106,718 & 102,280 & 208,998\\
+Detected non-English & 645 & 230 & 875\\
+Not Bitcoin-relevant & 6,245 & 80 & 6,325\\
+Duplicate canonical URL & 469 & 158 & 627\\
+Same-day duplicate headline & 44,228 & 28,941 & 73,169\\\midrule
+\textbf{Retained for scoring} & \textbf{120,715} & \textbf{129,760} & \textbf{250,475}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The retained headlines are unevenly distributed over time. Coverage is thinnest in 2022, with 26,569 headlines or roughly 73 per day, and richest in 2024, with 67,261.
+
+\subsection{Availability of a headline}
+A headline is treated as available at the later of its GDELT batch time and its precise publication time, and it belongs to the UTC date of that moment. The rule sacrifices some immediacy but prevents inadvertent look-ahead. About half of all records have no precise publication time. Among the retained 2021--2023 headlines, 822 have a publication time more than seven days earlier than the time at which GDELT recorded them. Assigning these to their publication dates would have given the models news before the archive could have shown it.
+
+\subsection{Coverage gaps and the volume step}
+The daily sentiment table has 2,069 rows. For 17 consecutive days, from 15 June to 1 July 2025, no usable headline survived the cleaning. A neutral score was not imputed for these days. The rows carry a zero article count, an empty mean and a no-news flag, and the model input layer replaces the empty mean with a numerical value only in combination with that flag.
+
+\figurewide{sentiment_coverage.pdf}{Monthly retained headline volume and average VADER score. The dashed line marks the start of the second export, and the shaded block is the 17-day gap.}{fig:newsvolume}
+
+A second feature is the volume step. The mean daily article count rises from about 204 in December 2023 to about 302 in January 2024, where the two exports meet. This appears more consistent with a change in collection rules than with a sudden increase in Bitcoin news. The models therefore use sentiment shares and a logarithmic article count in place of raw counts. This mitigates the discontinuity without removing it, because the selection effect lies in the headlines themselves.
+
+Headlines also describe the coverage of publishers and of GDELT, not investors. An article count measures media availability and not attention, and it does not count independent opinions.
+
+\subsection{Data products}
+The clean price file, the daily VADER table, the daily FinBERT table and the modelling table are stored in \code{data/processed/}. Headline-level files and the raw GDELT exports are excluded from the shared repository, which limits its size and avoids redistributing publishers' text. After the warm-up rows and the unlabelled final day are removed, the modelling table has 2,038 rows from 31 January 2021 to 30 August 2026, with 1,013 up days and 1,025 not-up days. Fourteen-day windows leave 2,025 usable endpoints. Calendar days, table rows and windows are kept distinct throughout, so that sample sizes are not confused.

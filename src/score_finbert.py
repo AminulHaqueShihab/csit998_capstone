@@ -1,7 +1,4 @@
-"""Stage 8 (optional, SF-03): score the SAME cleaned headlines with FinBERT instead of VADER.
-
-Model: ProsusAI/finbert (positive / negative / neutral probabilities). Score = P(pos) - P(neg), range -1..1.
-Chunks are saved as they finish, so an interrupted run resumes where it stopped.
+"""Stage 8: score the cleaned headlines with FinBERT.
 
 Run: python -m src.score_finbert
 """

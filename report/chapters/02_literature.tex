@@ -1,0 +1,57 @@
+\section{Literature Review}
+\label{ch:lit}
+\subsection{Forecasting direction rather than price}
+A price series appears highly structured, but structure is not predictability. Successive closes are close to one another partly because a price is a cumulative quantity, so a series can look smooth while the sign of its next change remains almost random. Daily returns of liquid assets typically show little linear autocorrelation, even though their volatility is clustered \cite{cont2001}. For this reason the task is posed as classification of the sign of the next return and not as regression on the price level. The harder question is also the more informative one: whether a model can separate tomorrow's up days from the rest using only information that is already available.
+
+The efficient-market view supplies a useful prior. In its classical form, competitive markets incorporate public information quickly enough that short-horizon returns are difficult to forecast \cite{fama1970}. Evidence on Bitcoin is mixed. Urquhart~\cite{urquhart2016} reported inefficiency over a full sample, whereas Nadarajah and Chu~\cite{nadarajah2017} showed that a simple transformation of the returns is consistent with weak-form efficiency, which illustrates how sensitive such conclusions are to specification. The adaptive-markets view suggests that predictability may appear and disappear as conditions change \cite{lo2004}. Large-scale evidence from US equities indicates that machine-learning methods can improve return prediction, but that the attainable out-of-sample gains are small \cite{gu2020}. Any edge observed in our data should therefore be regarded as provisional until it survives careful testing.
+
+Non-stationarity is the second concern. The relationship between a feature and the next move may differ between a rally, a crash and a quiet period, and the same headline may carry different implications in different months. A model trained on several years of data may learn an average response that fails in the final test period.
+
+\subsection{LSTM networks and their use in finance}
+Recurrent networks are designed for ordered observations. The LSTM adds gates and a memory cell that regulate what is retained and what is discarded \cite{hochreiter1997,gers2000}. The architecture suits tasks in which the next value may depend on recent volatility, momentum or a run of news days, and it has been applied to financial prediction with some success. Fischer and Krauss~\cite{fischer2018} reported that LSTM networks outperformed memory-free classifiers on daily directional prediction for constituents of the S\&P~500, although the excess returns diminished in later years. Systematic reviews document the rapid growth of deep-learning studies of financial time series \cite{sezer2020}.
+
+An LSTM does not guarantee useful long-range memory. A 14-day window supplies fourteen daily states regardless of the length of the training history. In our data the 1,418 training windows overlap heavily, with adjacent windows sharing thirteen of fourteen days, so they represent far fewer independent histories than the count suggests.
+
+Cryptocurrency studies have followed a similar path. Early work applied recurrent networks, ARIMA models and Bayesian neural networks to Bitcoin price data \cite{mcnally2018,jang2018}. Later studies added sentiment. Huang et al.~\cite{huang2021} built a cryptocurrency-specific lexicon from Chinese Weibo posts and reported gains over an autoregressive benchmark. Abraham et al.~\cite{abraham2018} related tweet volume and sentiment to Bitcoin and Ethereum prices, and Girsang and Stanley~\cite{girsang2023} combined FinBERT scores from Twitter with a hybrid LSTM-GRU network for Ethereum and Solana. These results show that sentiment can help in some configurations. They do not show that a daily English news model will behave in the same way, since the source, horizon and evaluation design differ.
+
+\subsection{Sentiment and market prices}
+Price indicators describe what the market has already done, whereas sentiment tries to capture how events are being framed. Bollen et al.~\cite{bollen2011} reported that Twitter mood helped to predict a stock index, and Tetlock~\cite{tetlock2007} found that pessimism in a widely read newspaper column anticipated downward pressure on prices followed by reversion. Studies of Bitcoin have connected search and encyclopaedia activity to price movements \cite{kristoufek2013}.
+
+A link between mood and price can be read in two ways. In the predictive reading, mood shifts first and prices follow. In the reactive reading, prices move and commentators respond. Both may operate at once, and a contemporaneous correlation cannot separate them. Lead and lag relationships in the sense of Granger~\cite{granger1969} are therefore more informative than a single correlation, and a next-day test is the appropriate check of the predictive reading.
+
+A further difficulty is that a sentiment score measures wording and not market impact. A headline such as ``Bitcoin falls after exchange concerns'' is negative in tone, yet it may describe an event that prices have already absorbed. Treating tone as a direct measure of future selling pressure is a strong assumption. Work on financial text has also shown that general-purpose word lists misclassify many terms that have a different meaning in finance \cite{loughran2011}.
+
+\subsection{VADER and FinBERT}
+VADER is a rule-based scorer with a lexicon tuned to social-media language \cite{hutto2014}. It yields a compound score between $-1$ and $1$ and runs cheaply on large volumes of short text. Its main limitation is the lack of financial context: it cannot distinguish a routine price recap from a genuine shock.
+
+FinBERT fine-tunes a pre-trained transformer language model \cite{devlin2019} on financial text and returns positive, neutral and negative probabilities \cite{araci2019}. It should therefore interpret finance-specific vocabulary more reliably. Better sentiment classification does not, however, imply better price prediction. A model may score tone accurately while the scored text carries little information about the next return, and each claim requires its own test.
+
+Recent studies illustrate the variety of designs. Seabe et al.~\cite{seabe2025} compared LSTM, GRU, bidirectional LSTM and temporal-attention models using VADER and RoBERTa features. Mohammadi Nezhad et al.~\cite{nezhad2026} argued that the aggregation of sentiment and the definition of movement categories matter as much as the architecture, and Tiwari et al.~\cite{tiwari2025} used an attention-augmented hybrid network with social-media sentiment. The reported percentages are not directly comparable with ours, because the targets, horizons and splits differ.
+
+\subsection{Baselines and evaluation metrics}
+XGBoost builds additive decision trees and handles nonlinear interactions without modelling a sequence \cite{chen2016}. Tree ensembles often remain competitive with deep networks on tabular data \cite{grinsztajn2022}, so a comparison with an LSTM indicates whether recurrence adds anything to engineered indicators. We also use a deliberately simple baseline, the class that was more common in training. When classes are not perfectly balanced, such a rule can exceed 50\% without learning anything about the market.
+
+Accuracy alone can mislead. Balanced accuracy weights the two classes equally \cite{brodersen2010}. Precision is the fraction of predicted rises that were real, and recall is the fraction of real rises that were found \cite{sokolova2009}. A model that always answers ``not up'' can appear respectable on accuracy while having zero recall for rises, so every headline figure is accompanied by a confusion matrix.
+
+\subsection{Evaluation of time-series models}
+Standard cross-validation assumes exchangeable observations and is therefore unsuitable for ordered data. Rolling-origin evaluation is the usual alternative \cite{tashman2000,hyndman2021}. The model is repeatedly trained on the past and tested on the immediate future. Some blocked forms of cross-validation remain valid when the model is purely autoregressive \cite{bergmeir2012}. In financial applications, overlapping labels create additional leakage between training and test sets, and purging and embargo procedures have been proposed to reduce it \cite{lopezdeprado2018}. A related concern is the multiplicity of comparisons. When many models and configurations are examined on the same data, some will appear successful by chance \cite{bailey2014,harvey2016}. These considerations motivate the frozen test set, the walk-forward analysis and the correction for multiple tests used in this study.
+
+\subsection{Gaps and the position of this study}
+\begin{table}[htbp]\centering\small
+\caption{Selected related work and its relation to this project}\label{tab:lit}
+\begin{tabularx}{\textwidth}{p{3.3cm}p{2.9cm}X}
+\toprule
+Study & Main idea & Implication here\\\midrule
+Fischer and Krauss~\cite{fischer2018} & LSTM for daily stock direction & LSTMs can be applied to direction, but gains may erode over time.\\
+Huang et al.~\cite{huang2021} & Weibo sentiment with an LSTM & Domain-specific text handling can help, but source and horizon differ.\\
+Girsang and Stanley~\cite{girsang2023} & FinBERT on tweets with LSTM-GRU & Gains reported for Ethereum and Solana, on a different asset and source.\\
+Seabe et al.~\cite{seabe2025} & Several networks with VADER and RoBERTa & Contextual sentiment deserves a test, but is not adopted automatically.\\
+Mohammadi Nezhad et al.~\cite{nezhad2026} & GRU, sentiment aggregation, movement regimes & Label and feature choices need explicit sensitivity checks.\\
+Araci~\cite{araci2019} & Finance-adapted language model & FinBERT is a fair alternative to a generic lexicon.\\
+Chen and Guestrin~\cite{chen2016} & Gradient-boosted trees & A credible non-LSTM tabular baseline.\\
+This study & Controlled BTC next-day classification & Same dates, fixed target, majority baseline, ten seeds, paired intervals, walk-forward and lag analyses.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The literature gives sound reasons to test sentiment and fewer reasons to assume that it helps. Accuracy figures from different papers cannot be compared unless the label, horizon, period and protocol coincide. The comparison here is therefore kept narrow. The gap addressed is empirical: whether daily news-sentiment aggregates add information beyond price indicators in this Bitcoin sample. A near-chance outcome does not contradict studies that found gains. It indicates that those gains did not appear under the data, aggregation and evaluation used here.

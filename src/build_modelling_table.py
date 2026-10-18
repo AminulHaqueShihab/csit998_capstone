@@ -1,7 +1,4 @@
-"""Stage 4: build the versioned modelling table (DS-01).
-
-One row per UTC day t with price features, sentiment features (both known by 23:59:59 UTC on
-day t) and target_direction = [Close(t+1) > Close(t)].
+"""Stage 4: build the modelling table (price + sentiment features, next-day direction target).
 
 Run: python -m src.build_modelling_table
 """

@@ -1,15 +1,4 @@
-"""Stage 2: clean GDELT Bitcoin headlines.
-
-Steps (every drop is counted in reports/news_quality_report.json):
-  1. parse timestamps to UTC; compute the time each item became available
-  2. decode HTML entities, normalise whitespace, drop empty/very short headlines
-  3. keep English only (no machine-translation flag + detector fallback)
-  4. label asset relevance (BTC / ETH / BTC+ETH / irrelevant); drop irrelevant
-  5. drop duplicate URLs and same-day duplicate headlines
-
-Availability time: GDELT's own timestamp (`gdelt_timestamp`, 15-minute UTC batch) is when the
-item entered the dataset. `precise_publication_timestamp` is usually missing and can be earlier.
-Both are valid, so the later one is used: that is the conservative choice for a no-leakage cutoff.
+"""Stage 2: clean GDELT Bitcoin headlines (UTC times, English only, deduplicated).
 
 Run: python -m src.prepare_news
 """

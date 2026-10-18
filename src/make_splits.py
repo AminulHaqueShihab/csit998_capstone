@@ -1,12 +1,5 @@
 """Stage 5: chronological split, training-only scaling and LSTM sequences.
 
-Everything a model needs, built once so every model sees identical dates (DS-02, ML-05):
-  - split dates fixed in config.SPLIT_DATES (documented before modelling)
-  - scalers fitted on TRAIN rows only and saved; applied unchanged to validation and test (PF-02)
-  - sample for day t = the previous SEQ_LEN days of features ending at t (look-back may reach into
-    an earlier split: that is past data and is legitimate), target = direction of day t+1
-  - Model A inputs: price features. Model B inputs: the same price features + VADER sentiment features.
-
 Run: python -m src.make_splits
 """
 import json

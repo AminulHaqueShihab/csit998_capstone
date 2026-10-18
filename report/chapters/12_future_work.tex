@@ -1,0 +1,27 @@
+\section{Future Work}
+\label{ch:future}
+A list of every possible technique would be of little use. The next steps are therefore ranked by the gap in the evidence that each would close.
+
+\subsection{Harmonising the news corpus and its timing}
+The first requirement is methodological housekeeping. A single versioned BigQuery query should be run across the whole period, so that the 2021--2023 and 2024--2026 exports share one filter. This would show how much of the January 2024 volume step is a collection effect and how much reflects genuine change in coverage.
+
+Timing is the second requirement. Where the metadata allow, the first-seen publication time should be retained and features computed over fixed windows that end before the cutoff. Stories that arrive late enough to affect the following close could then be distinguished from those that arrived in time to matter on the day. If the historical metadata cannot support this, the limitation should be stated and not circumvented by assumption.
+
+\subsection{Testing on genuinely new dates}
+Every result reported here comes from days that have now been examined. A clean confirmation requires a period after 31 August 2026, or a segment that was never used to choose extensions. Expanding-window backtests should continue, recording each fold's class balance, volatility, headline coverage and intervals. Log loss and the Brier score \cite{brier1950} would complement fixed-threshold accuracy. The aim is to learn how stable a signal is, and not to locate the one fold in which sentiment performs best.
+
+\subsection{Modelling what a headline is about}
+The lag analysis suggests that average daily tone mostly reflects the past. A more promising route is to model content. A classifier could separate regulation, exchange incidents, macroeconomic news, technical developments and routine price summaries, with source credibility, novelty and urgency as transparent inputs. A small, carefully sampled set of human labels would show whether VADER and FinBERT measure the intended quantity at all.
+
+Timing deserves attention as well. Sentiment aggregated over the last 3, 6, 12 and 24 hours, built under the same no-look-ahead rule, would test whether temporal resolution was the missing element. A contextual encoder or attention layer is worth considering only after the inputs and timing have been validated.
+
+\subsection{Simpler models and ablations}
+Before adding LSTM capacity, a regularised logistic regression should be fitted and feature groups compared: price alone, price with mean sentiment, price with sentiment shares, and price with news volume. This would separate a weak sentiment score from a misleading volume artefact. The 14-day look-back should also be compared with 7, 30 and 60 days within a nested validation scheme. Other targets, such as three-day direction or large-move classification, deserve a proper test, and each new primary task requires its own fresh evaluation period.
+
+\subsection{Regimes and economic value}
+A fuller financial study would divide time into rising, falling, calm and turbulent regimes using only past or current information, and would ask whether sentiment helps mainly after unusual announcements. It could also test abstention, in which a model commits to a direction only when a validation-calibrated confidence is high \cite{guo2017}. This trades coverage for quality, so both the accuracy on retained days and the share of days skipped must be reported.
+
+A trading backtest is appropriate only if a stable out-of-sample signal appears. It would require fees, spread, slippage, latency, turnover and drawdowns, and care would be needed to avoid backtest overfitting \cite{bailey2014}. A classifier with 52\% accuracy can still lose money, and the present evidence says nothing in either direction.
+
+\subsection{Wider coverage}
+Only one asset, one exchange and one news source were used. Ethereum, other venues and sources such as Reddit were outside the scope. Adding them would show whether the result is specific to Bitcoin headlines or reflects a broader weakness of daily sentiment. SHAP explanations would be informative once a model with real signal exists. Explaining a near-chance model has limited value.

@@ -1,0 +1,77 @@
+\section{Model Preparation}
+\label{ch:preparation}
+\subsection{Definition of the predictors}
+The proposal referred to the trained predictors as agents. In this project the term denotes a classifier only. It accepts a window of market and news features and returns the probability that the following day closes higher. It does not browse the web, place orders or act autonomously. Preparation consists of converting raw data into comparable inputs, fixing the target and window, handling missing values and fitting scalers on the correct rows. A network cannot recover information that the pipeline never provided.
+
+\subsection{Price indicators}
+Standard indicators are derived from the current and earlier days only. They comprise the simple and logarithmic daily return and the ratios of the close to its 7-day and 30-day moving averages. Further indicators are 7-day and 14-day momentum, a 14-day relative strength index, 14-day volatility, the daily high-to-low range and a volume ratio. With $C_t$ denoting the close on day $t$,
+\begin{align}
+r_t &= \frac{C_t-C_{t-1}}{C_{t-1}}, &
+\ell_t &= \log\left(\frac{C_t}{C_{t-1}}\right),\\
+\operatorname{SMA}_{7,t}&=\frac{1}{7}\sum_{j=0}^{6}C_{t-j}, &
+q_{7,t}&=\frac{C_t}{\operatorname{SMA}_{7,t}}.
+\end{align}
+No quantity on day $t$ uses a later day, and a unit test confirms this by altering future prices and checking that earlier features are unchanged.
+
+Raw price levels and raw moving averages were excluded from the final inputs. The Bitcoin close ranged from about \$15{,}800 in November 2022 to about \$124{,}700 in October 2025. A scaler fitted on 2021--2024 would therefore encounter 2026 prices outside anything it had seen. Ratios and returns do not remove every shift, but they depend far less on the dollar level.
+
+\begin{table}[htbp]\centering\small
+\caption{The eleven price features used by Model A and reused unchanged by Model B}\label{tab:pricefeatures}
+\begin{tabularx}{\textwidth}{p{4.4cm}X}
+\toprule
+Input & Construction\\\midrule
+\code{return_1d} & Close-to-close simple return\\
+\code{log_return_1d} & Logarithmic daily return\\
+\code{close_over_sma_7} & Close divided by the 7-day moving average\\
+\code{close_over_sma_30} & Close divided by the 30-day moving average\\
+\code{momentum_7} & Relative price change over seven days\\
+\code{momentum_14} & Relative price change over fourteen days\\
+\code{rsi_14} & 14-day relative strength index\\
+\code{volatility_14} & 14-day standard deviation of returns\\
+\code{hl_range_pct} & Daily high-to-low range divided by the close\\
+\code{volume_ratio_7} & Volume divided by its 7-day average\\
+\code{log_volume} & Natural logarithm of daily base-asset volume\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Headline scoring and daily aggregation}
+Each retained headline receives a VADER compound score. A score of at least $0.05$ is classed as positive and a score of at most $-0.05$ as negative, with values in between classed as neutral \cite{hutto2014}. The pipeline then summarises each UTC date by the mean score, the positive and negative counts, the number of eligible articles and the number of distinct sources. The LSTM never observes the headline text, only these daily summaries.
+
+\begin{table}[htbp]\centering\small
+\caption{The five additional inputs supplied to Model B}\label{tab:sentfeatures}
+\begin{tabularx}{\textwidth}{p{4.5cm}X}
+\toprule
+Feature & Meaning\\\midrule
+\code{vader_mean} & Mean compound score of day-$t$ articles\\
+\code{vader_pos_share} & Positive articles divided by all articles, zero when there are none\\
+\code{vader_neg_share} & Negative articles divided by all articles, zero when there are none\\
+\code{log_article_count} & $\log(1+N_t)$, which reduces the effect of large volume swings\\
+\code{no_news_flag} & One when no eligible article exists that day, otherwise zero\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The aggregation involves considerable compression. A breaking regulatory story and a routine price summary carry equal weight in a daily mean. An article published at 23:55 is treated like one published at 00:05, although the former has almost no time left to influence the next close. Shares are less sensitive than raw counts to the volume step described in Section~\ref{ch:data}, but they do not remove it.
+
+\subsection{FinBERT substitution}
+The secondary pipeline scores the same 250,475 headlines with \code{ProsusAI/finbert}. Each headline receives positive, neutral and negative probabilities, and the daily features mirror the VADER ones: a mean score, positive and negative shares, the logarithmic article count and the no-news flag. Only the sentiment representation changes. The corpus, dates and target are identical.
+
+The two scorers differ considerably. They assign the same label to 49.9\% of headlines, their headline-level scores correlate at 0.389, and their daily means correlate at 0.702. The two therefore measure related but distinct quantities. Without a human-labelled sample and a link to later returns, it is not possible to say which is closer to the truth.
+
+\subsection{Alignment and missing days}
+Each daily sentiment row is joined to the price row for the same UTC date, and the label is taken from the following day. A window ending at $t$ contains days $t-13$ to $t$ and never $t+1$. The code requires dates to be consecutive before any window is built, and no-news days remain in the series. This matters for a sequence model: if a missing week were dropped, the network would treat days that are seven days apart as neighbours.
+
+A no-news day carries the binary flag and a neutral numerical default for the mean score. The default does not restore the missing information. Its function is to allow the flag to indicate that the value is a placeholder.
+
+\subsection{Scaling and input shapes}
+Each non-binary feature $j$ is standardised using the training mean and standard deviation:
+\begin{equation}
+z_{t,j}=\frac{x_{t,j}-\mu^{\mathrm{train}}_j}{\sigma^{\mathrm{train}}_j}.
+\end{equation}
+Validation and test rows reuse the stored values, and the no-news flag is passed through unscaled. A unit test confirms that changing validation or test values leaves the scaler unchanged.
+
+Model A takes tensors of shape $[n,14,11]$ and Model B tensors of shape $[n,14,16]$, with $n$ equal to 1,418, 273 and 334 for training, validation and test respectively. Adjacent windows share thirteen of their fourteen days, so the training set contains considerably less independent evidence than 1,418 might suggest.
+
+\subsection{Open design questions}
+Some design choices merit caution. A 14-day look-back may be too short to capture medium-term effects, same-day averaging may blur the timing of a market reaction, and treating a 0.01\% rise identically to a 10\% rise discards information. All three were retained as specified, because changing them after observing test accuracy would have defeated the purpose of fixing the experiment in advance.

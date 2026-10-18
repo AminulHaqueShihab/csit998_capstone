@@ -1,0 +1,63 @@
+\section{Benchmarking}
+\label{ch:benchmark}
+\subsection{Requirements of a fair benchmark}
+Two published ``Bitcoin prediction'' figures can describe very different tasks, with other exchanges, date ranges, label definitions and test periods. Even within one project, a next-day up/down classifier should not be ranked beside a seven-day regression as if both measured the same quantity. The primary test is therefore treated as the single fixed yardstick: the same 334 dates, the same target, the same threshold and matched LSTM settings.
+
+Absolute and incremental value are different matters as well. An accuracy of 50\% means little without a constant-class rule beside it. Here the majority rule scores 51.50\%, slightly above every primary learned ensemble, and this is the central benchmark finding.
+
+\subsection{The majority-class rule}
+The training set has 714 not-up days and 704 up days, so the rule always predicts ``not up''. On the test period 172 of 334 days were not-up, giving
+\begin{equation}
+\mathrm{Acc}_{\mathrm{majority}}=\frac{172}{334}=0.51497.
+\end{equation}
+The rule identifies no individual rise and has zero up-class recall. A claim that an LSTM is a useful direction classifier therefore has to explain why its additional errors are worthwhile, perhaps through better-calibrated probabilities \cite{guo2017}. The saved results provide no such justification.
+
+A majority rule is not equivalent to a fair coin. A coin lands near 50\% on balanced labels, whereas the majority rule exploits class frequency and can exceed 50\% on a similar future period without any knowledge of the market. Both 50\% and the actual baseline are therefore reported, so that the gap to the neural models is not overstated.
+
+\subsection{LSTM compared with XGBoost}
+XGBoost operates on the engineered inputs as a flat row and has no recurrent state. Its price-only ensemble reached 49.40\% on the test days, with a seed average of 47.69\%. LSTM A's ensemble scored 50.00\%, only 0.60 points higher. This is far too small to claim an advantage for recurrence, and no paired interval was computed for this particular comparison. In the walk-forward test the ordering is clearer but still modest, with 51.4\% for LSTM A against 47.5\% for XGBoost over 1,338 days.
+
+The additional XGBoost with VADER features scored 47.90\% as an ensemble. Its seed-average accuracy (48.68\%) was higher than that of the price-only version, but its ensemble accuracy was lower, so the two summaries disagreed. This is a reason not to exchange seed-average and ensemble figures.
+
+\subsection{VADER compared with FinBERT}
+A finance-trained language model appears a natural remedy for the weaknesses of VADER. The substitution did change the sentiment inputs, and the two scorers assign the same label to only half of the headlines. Yet the FinBERT LSTM ensemble reached 47.90\% on the test days, against 48.50\% for VADER and 50.00\% for price only. The paired difference to VADER was $-0.60$ points, with an interval from $-4.19$ to $+3.00$.
+
+In the walk-forward test FinBERT was slightly ahead, with 52.17\% against 50.00\% for VADER and 51.42\% for price only. The interval for FinBERT minus price-only runs from $-1.64$ to $+3.07$ points, so this is not interpreted as a genuine gain. A stronger language model may classify a headline more accurately and still leave tomorrow's price equally unpredictable.
+
+FinBERT inherited the frozen settings and was not tuned on its own, so these runs test the value of the substitution under shared conditions and do not establish an upper bound for FinBERT.
+
+\subsection{Other horizons and large moves}
+Three-day and seven-day direction were also examined, together with two tasks that train only on days with large moves. These were run after the primary set-up, use different labels and share the test period, so they are exploratory.
+
+\begin{table}[htbp]\centering\small
+\caption{Ensemble accuracy (\%) on the test days for the extension tasks. The 1\% and 2\% rows train only on days whose next-day move was at least that large, and score all test days.}\label{tab:extensions}
+\begin{tabularx}{\textwidth}{Xrrrrr}
+\toprule
+Task & Test days & Majority & LSTM A & B (VADER) & B (FinBERT)\\\midrule
+Next-day direction & 334 & 51.50 & 50.00 & 48.50 & 47.90\\
+Three-day direction & 332 & 50.00 & 54.22 & 50.90 & 50.90\\
+Seven-day direction & 328 & 45.43 & 51.22 & 46.65 & 47.26\\
+Next day, trained on moves $\geq1\%$ & 334 & 48.50 & 50.60 & 49.10 & 48.80\\
+Next day, trained on moves $\geq2\%$ & 334 & 48.50 & 47.90 & 48.50 & 49.70\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\figurewide{horizon_extensions.pdf}{Ensemble accuracy at the three prediction horizons. These tasks were not pre-specified and are not directly comparable with the primary result.}{fig:extensions}
+
+The three-day row attracts attention. LSTM A reached 54.22\%, while the sentiment models reached 50.90\%. This could indicate that price indicators carry some information at that horizon. When only every third day is scored, so that outcomes do not overlap, the figure falls to 52.25\% on 111 days. The seven-day price-only result of 51.22\% falls to 46.81\% on 47 non-overlapping weeks. A model without skill can deviate by $\pm9.3$ points at three days and $\pm14.3$ points at seven, so none of these differences is large enough to be relied on.
+
+The large-move tasks changed little. Training on days with moves of at least 1\% (880 training windows) or 2\% (553 windows) left the LSTM ensembles between 47.9\% and 50.6\%, which is within the same noise. Scoring only the test days that turned out to be large appears more favourable in places: 53.57\% for LSTM A on the 196 days with a 1\% move, and 52.08\% for FinBERT on the 96 days with a 2\% move. These figures should not be relied upon. The size of tomorrow's move is unknown in advance, so such a subset cannot be selected in practice, and 96 days leaves a margin of about ten points.
+
+Five tasks and several models on one period also constitute a multiple-testing problem. With so many scores, a few will exceed the baseline by chance alone \cite{harvey2016,bailey2014}.
+
+\subsection{Interpreting the plateau}
+It would be wrong to conclude that LSTMs predict Bitcoin at random in general. The narrower reading is that the signals provided here showed little ability to separate up days from the rest in this period. Several results point the same way. The majority rule edges out the learned models on the test days, balanced accuracies hover around 50\%, predicted probabilities cluster near the threshold, and sentiment does not help on one split or across eight. The lag analysis supplies a plausible reason, since the headlines trail the price.
+
+Sample size matters as much as the ranking. With 334 days, a guessing model has a 95\% band of about $\pm5.4$ points, and overlapping windows and shifting regimes probably widen it. One model winning by 0.6 points is not an advantage in any statistical or economic sense.
+
+\subsection{Published figures}
+Several papers report strong sentiment gains \cite{huang2021,seabe2025,nezhad2026}. They are useful sources of ideas but not a leaderboard. A low percentage error on a continuous price is a different quantity from 50\% directional accuracy, and a model trained on minute-level social data and tested on a volatile stretch addresses a different problem from daily close-to-close classification. A fair external benchmark would require public data, the same label, the same decision time, the same held-out dates and preferably released predictions. In their absence, the internal baselines and fixed split offer firmer ground than numbers taken from other settings.
+
+\subsection{Beyond accuracy}
+Directional accuracy says nothing about monetary value. A correct call before a 0.1\% rise counts the same as one before a 10\% rise, and a small miss counts the same as a severe one. Assessing trading value requires a decision rule, a holding period, fees, slippage, risk limits and drawdown analysis, together with evidence that signals can be produced and acted upon at the cutoff. None of this was built, so the conclusion is limited to classification performance. On that measure no primary model beat the training-majority baseline on the fixed test days.

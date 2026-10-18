@@ -1,0 +1,66 @@
+\section{Discussion}
+\label{ch:discussion}
+\subsection{Return to the research question}
+The study began from a reasonable assumption: that market history together with news sentiment should describe the next day's Bitcoin direction better than market history alone. The experiment did not support it. Adding VADER reduced the price-only ensemble from 50.00\% to 48.50\% on the test days, and replacing it with FinBERT did not reverse the outcome. Across eight walk-forward periods the sentiment models stayed within about two points of the price-only model, in both directions. Because the paired interval on the single split extends from $-5.7$ to $+2.4$ points, it cannot be concluded that sentiment is harmful either. The defensible conclusion is that no incremental predictive value was found, which differs from showing that news is never informative.
+
+The distinction deserves emphasis. A well-controlled negative result remains informative, because it shows which intuitions failed and under which conditions. The more productive question is therefore not how to raise the number but at which link of the chain the information is lost.
+
+\subsection{Why accuracy remains close to 50\%}
+\subsubsection{A difficult target}
+The next day's close depends on events that do not exist at the cutoff, and traders can act on public information before a daily aggregate is computed. The efficient-market view makes weak predictability plausible \cite{fama1970}, although efficiency itself was not tested here. The class balance points the same way. The test period contains 48.50\% up days, so a model with almost no signal will remain near 50\% however it varies its calls, which is what the confusion matrices show.
+
+\subsubsection{Sentiment follows price}
+This is the clearest result obtained, and the lag analysis sharpens it. FinBERT's daily sentiment correlates 0.449 with the previous day's return and $-0.012$ with the next day's. For VADER the corresponding values are 0.262 and 0.005. None of the 60 forward-looking tests (all targets and measures with $k\geq1$) reached $p<0.05$, whereas 25 same-day or backward-looking tests remained significant after correction. The simplest reading is that a headline describes a move after it has occurred. GDELT also records stories some time after publication, and a daily bucket can place a reaction and its cause on the same date even when their order differs by hours.
+
+The finding is a correlation and has the usual limits. Nonlinear, event-specific or very short-lived effects could lie behind it, and intraday timing was not examined. It nevertheless provides a concrete reason why a better sentiment classifier alone would not rescue the forecast. If the input describes an event that the price has already absorbed, a more accurate reading of it does not help.
+
+\subsubsection{Daily averages obscure timing and meaning}
+A day's mean sentiment collapses hundreds of headlines into one number. A short policy announcement is averaged with routine price summaries and paraphrased copies. A story at 00:05 and another at 23:55 fall in the same bucket, although one has a full day in which to matter and the other almost none. If a genuine effect lasts a few hours, a daily average would dilute it. Daily resolution was chosen for historical depth and reproducibility, and it may be one of the main reasons why sentiment did not help.
+
+\subsubsection{Measurement noise and coverage}
+VADER scores wording and FinBERT adds financial context, but neither was trained to estimate the effect of a headline on Bitcoin's next close. Both can be consistent as sentiment scorers and still address the wrong construct. Headlines were used in place of articles, and non-English and translated sources were removed, so a great deal of coverage is absent. The two GDELT exports used slightly different filters, which probably produced the step in headline volume in January 2024, and a 17-day gap lies in the validation period. Shares and a logarithmic count soften the volume problem without solving it.
+
+\subsubsection{Limited independent training evidence}
+The 1,418 training windows overlap so strongly that adjacent ones share thirteen days. They also cover one asset and a limited set of market regimes. Model B adds five inputs without adding a single new target day. If those inputs relate weakly or unstably to the next day's label, the additional dimensions make fitting less reliable even with dropout and early stopping. The test set contains 334 days, which allows a guessing model about $\pm5.4$ points of variation.
+
+\subsubsection{Changing conditions}
+Bitcoin's volatility, price level and news environment changed substantially between 2021 and 2026. Ratios reduce the dependence on scale but do not make the relationship stationary, and such instability is a recognised feature of financial series \cite{lo2004}. The walk-forward results show it directly. Period accuracy ranged from 39.8\% to 58.0\%, every learned model had its weakest full six-month period in the first half of 2026, and the decline of Model A from 57.14\% on validation to 50.00\% on test is consistent with the same pattern. It cannot be determined whether regime change, selection optimism or both were responsible. A single split provides one transition from past to future, and eight periods give a better impression of how fragile a signal is.
+
+\subsubsection{A threshold that decides little}
+The output is a probability, but headline accuracy applies a hard cut at 0.5. About four-fifths of the LSTM probabilities lie within 0.05 of it, so a small shift changes a call. Better calibration \cite{guo2017} or a rule that abstains when uncertain could help. Choosing a new cutoff that maximises accuracy on the same 334 days would not, since it would give an optimistic figure without stronger evidence. Any new threshold has to be derived from training and validation data and then confronted with fresh dates.
+
+\begin{longtable}{p{3.1cm}p{5.6cm}p{5.0cm}}
+\caption{Possible explanations for the plateau, the evidence available, and tests that would distinguish them}\label{tab:causes}\\
+\toprule
+Explanation & Evidence so far & Test that would help\\\midrule\endfirsthead
+\toprule
+Explanation & Evidence so far & Test that would help\\\midrule\endhead
+Weak next-day signal & Classes near 50\%; no model beats the majority rule; walk-forward pooled accuracy 47.5\% to 52.2\% & A fresh period after August 2026\\
+News follows price & Correlation 0.449 at $k=-1$, about 0 at $k=+1$ & First-seen timestamps and intraday windows\\
+Over-aggregation & A daily mean ignores when a story appeared & Six-hour or hourly windows with a strict cutoff\\
+Wrong construct & VADER and FinBERT agree on half of the labels, and neither helps & A human-labelled relevance sample; topic features\\
+Coverage inconsistency & Volume step at January 2024; 17-day gap & One versioned query for both periods\\
+Few independent samples & 1,418 overlapping windows, one asset & More assets or a longer history\\
+Regime shifts & Period accuracy from 39.8\% to 58.0\%; validation-to-test drop of 7.1 points & Analysis by volatility regime\\
+Threshold sensitivity & 81\% of probabilities within 0.45 to 0.55 & Validation-only calibration and abstention\\
+Overfitting & Model B adds inputs without better scores & Feature ablations and a logistic baseline\\
+\bottomrule
+\end{longtable}
+
+The right-hand column lists tests that were not carried out, and none of them should be counted as achieved.
+
+\subsection{Would a larger network help?}
+A near-chance result invites the response of attention layers, a deeper LSTM or a transformer. Such models can represent richer patterns, and earlier work shows specialised architectures performing well on some cryptocurrency tasks \cite{seabe2025,tiwari2025}. Capacity cannot, however, create information that is missing, late or unrelated to the target, and in a limited sample it increases the risk of fitting noise. A more cautious progression would start from the other end. A regularised logistic regression with price features and a single sentiment feature would show whether a sign-stable relationship exists at all, and only then would a larger model be warranted.
+
+\subsection{Statistical interpretation and selective success}
+The bootstrap interval for B minus A includes zero. This prevents a confident claim that VADER lowers accuracy, and it equally prevents treating a more favourable result on another seed, horizon or subset as success. Five tasks and several models were examined on related test days, so selective reporting is a genuine risk. Only a new period can confirm a hypothesis selected from these exploratory results \cite{bailey2014}.
+
+The main bootstrap resamples single days. It preserves the pairing of the models but ignores serial dependence and therefore probably understates uncertainty. For the multi-day tasks and the pooled walk-forward results, blocks of days were resampled instead \cite{kunsch1989,politis1994}. Forecast accuracy can also be compared with tests designed for time series \cite{diebold1995}, which would be an appropriate refinement of the primary comparison.
+
+\subsection{Relation to earlier work}
+The gains reported by some sentiment-augmented studies were not reproduced. Several differences could account for this. Earlier work used social posts instead of headlines, domain-specific lexicons instead of VADER, finer horizons, price regression or different protocols \cite{huang2021,seabe2025,nezhad2026}. Their findings and ours can all be correct in their own settings. Comparing mechanisms and design is therefore more useful than comparing percentages, and a study reporting 95\% under a different label says nothing about whether the 50\% obtained here is poor.
+
+\subsection{Limitations and practical meaning}
+The analysis covers one pair on one exchange, a 2021 to 2026 history, daily binary direction, selected headlines and one final held-out period. The raw news files are not part of the shared code. Order-book depth, derivatives funding, macroeconomic releases and cross-asset flows were not used as features. The study also does not test whether any score would improve returns after costs. No execution simulation, position sizing or latency model was built, so no profitability claim follows. The artefacts are a research prototype that records the limits of its own evidence.
+
+The positive outcome is methodological. A forecast cutoff was fixed, baselines were kept in view, a test period was frozen, the spread across seeds was stored, and interval estimates were reported that made an attractive result more cautious. These are real outcomes even though the predictor itself is not useful for decisions.

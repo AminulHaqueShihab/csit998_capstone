@@ -1,9 +1,5 @@
 """Stage 3: score headlines with VADER and aggregate to one row per UTC day.
 
-Daily features (SF-02): mean compound score, positive/negative/neutral counts, article count,
-GDELT tone mean and unique-source count. Days with no retained article are kept as explicit
-rows with article_count = 0, no_news_flag = 1 and empty means (never invented).
-
 Run: python -m src.build_sentiment
 """
 import pandas as pd

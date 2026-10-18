@@ -1,8 +1,5 @@
 """Stage 1: verify, parse and validate Binance BTCUSDT daily klines.
 
-Raw zips are read-only inputs. Output: data/processed/btcusdt_1d_clean.csv plus
-quality reports. Rows are rejected and logged, never silently corrected or invented.
-
 Run: python -m src.prepare_price
 """
 import io

@@ -1,20 +1,6 @@
-"""Stage 11 (extension, NOT the approved primary target): other horizons and large-move training.
+"""Stage 11: other horizons and large-move training (exploratory, not the primary target).
 
-Tasks (declared before running; all are reported, none is picked after the fact):
-  daily_direction          Close(t+1) > Close(t)            (replicates the main target; sanity check)
-  3day_direction           Close(t+3) > Close(t)
-  weekly_direction         Close(t+7) > Close(t)
-  daily_large_moves_1pct   daily direction, TRAINING only on days with |next-day move| >= 1%
-  daily_large_moves_2pct   same with 2%
-Large-move tasks are scored two ways: on ALL test days (what could be used in practice) and on the test days
-whose realised move was large (descriptive only: tomorrow's move size is unknown at prediction time).
-
-Same split, features, 14-day windows, frozen LSTM/XGBoost settings (no re-tuning) and 10 seeds as the main experiment.
-Multi-day labels overlap, so samples whose label window runs more than one day past their split are dropped
-(purge), and confidence intervals use a block bootstrap. Models: naive, XGBoost (price), LSTM A (price),
-LSTM B (price + VADER), LSTM B (price + FinBERT).
-
-Run: python -m src.evaluate_extensions   (once; --force for a documented re-run)
+Run: python -m src.evaluate_extensions   (once; --force to re-run)
 """
 import argparse
 import json

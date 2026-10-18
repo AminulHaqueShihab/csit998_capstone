@@ -1,0 +1,13 @@
+\section{Conclusion}
+\label{ch:conclusion}
+This study examined whether news sentiment improves next-day Bitcoin direction forecasts. On the data available, it does not. A reproducible pipeline was built that joins 2,069 days of Binance BTCUSDT prices with 250,475 cleaned GDELT headlines. It applies explicit UTC availability rules, fits scalers on training days only, and compares matched models on fixed dates.
+
+On the 334 held-out test days, a price-only LSTM ensemble classified 50.00\% of days correctly and the VADER version 48.50\%. A rule that always predicts ``not up'' scored 51.50\%. The 1.50-point difference between the two LSTMs came with a 95\% interval from $-5.69$ to $+2.40$ points, and FinBERT performed no better.
+
+The comparison was then repeated across eight walk-forward periods covering 1,338 days. Pooled accuracy remained between 47.5\% and 52.2\% for every model. Adding sentiment shifted the price-only result by less than 1.5 points in either direction, and the intervals include zero.
+
+The lag analysis offers the most useful clue about the reason. Sentiment correlates 0.45 with the previous day's return and approximately zero with the next day's, so the headlines trail the market. A signal that reports what has already happened cannot predict what follows. The predicted-versus-actual curves show the other aspect. On the test days the models' probabilities stay close to 0.5, and over several months they alternate between predicting almost every day up and almost every day down.
+
+Several limits qualify these figures. The test set is small. The headlines come from two exports with slightly different filters, one news gap spans 17 days, and headlines were used instead of full articles. Intraday timing, other assets and trading returns were not examined. The extension and walk-forward analyses reuse the same later period, so they support the main result without replacing it.
+
+The principal contribution is the method. A fixed cutoff, a strong trivial baseline, stored seeds, interval estimates and a frozen test set converted an attractive hypothesis into a cautious conclusion. A small web interface was also built that allows the predictions to be replayed against the actual price. A clear negative result obtained under these controls is a sounder basis for further work than an impressive accuracy figure that cannot be trusted.

@@ -1,9 +1,4 @@
-"""Stage 6: choose hyperparameters on the VALIDATION split only, then freeze them (ML-05, ML-06).
-
-LSTM: one shared configuration for Model A and Model B (same architecture, optimiser and budget),
-chosen by the lowest mean validation loss across both models and several seeds.
-XGBoost: chosen by validation log loss on price features.
-Writes results/tuning_results.csv and results/frozen_config.json. Test data is never loaded here.
+"""Stage 6: choose hyperparameters on the validation split only, then freeze them.
 
 Run: python -m src.tune
 """

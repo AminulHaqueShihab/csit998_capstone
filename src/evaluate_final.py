@@ -1,9 +1,4 @@
-"""Stage 7: final training and the single evaluation on the untouched TEST split (EV-01..EV-04).
-
-Guards (DS-03): needs results/frozen_config.json from src.tune; refuses to run again once final results
-exist unless --force is given (and then records the re-run).
-Models: naive majority baseline, XGBoost (price; plus an extra price+sentiment variant), Model A (price-only
-LSTM), Model B (price + VADER LSTM). Each learned model is trained with 10 fixed seeds.
+"""Stage 7: final training and the single evaluation on the test split.
 
 Run: python -m src.evaluate_final
 """

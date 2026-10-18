@@ -1,0 +1,41 @@
+\section{Data Governance}
+\label{ch:governance}
+\subsection{Purpose}
+A forecasting pipeline can produce a tidy accuracy table while concealing doubts about the data behind it. A changed headline filter or an unnoticed timestamp leak can look exactly like a real signal. Governance is the means by which these risks were controlled. The source of each file was recorded, its integrity was verified, and each transformation applied to it was documented. These practices correspond to the principles of findable, accessible, interoperable and reusable data \cite{wilkinson2016} and to current recommendations for reproducible machine-learning research \cite{pineau2021}.
+
+The raw Binance archives, their checksum files and the raw GDELT exports are kept unmodified. Python scripts build every derived table from them, and the source register, data dictionary and quality reports in the repository describe each step.
+
+\subsection{Provenance and integrity}
+For prices, 68 monthly Binance archives were downloaded and each was compared with the publisher's SHA-256 checksum. All 68 matched. The cleaned table holds 2,069 unique days and passed the checks for chronological order, positive prices, high and low bounds and non-negative volume.
+
+For news, two BigQuery exports cover 1 January 2021 to 31 August 2026. The 2021--2023 file has 279,049 rows and covers all 1,095 days. Its SQL, schemas, row counts and exclusion counts are on record. Both raw files were fingerprinted so that the exact bytes used can be confirmed (Table~\ref{tab:hashes}).
+
+\begin{table}[htbp]\centering\small
+\caption{SHA-256 fingerprints of the raw GDELT exports used for the final results}\label{tab:hashes}
+\begin{tabularx}{\textwidth}{p{3.4cm}rX}
+\toprule
+File & Rows & SHA-256\\\midrule
+2021--2023 export & 279,049 & \texttt{\tiny 2e29cd2a29b7b9be8189c890bb02f142af2061062a152df4759e0c3843b90cd4}\\
+2024--Aug 2026 export & 261,469 & \texttt{\tiny 695e1b6c6062a33ac65e1219d06ca50708b5d1eae9574bea8c91d4ba263d0415}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+A separate audit pass over the 2024--2026 file retained all 261,469 records with quality flags and, after removing 44,341 repeated stories, left 217,128. It served as a cross-check of the cleaning. No model uses it, and its counts are not comparable with the stricter cleaning in Table~\ref{tab:newsdrops}.
+
+\subsection{Timestamps and leakage}
+Leakage is the principal way in which a sentiment model can mislead its authors. If a headline is treated as known on its stated publication date although the archive recorded it days later, the model is given information from the future. The adopted rule assigns each headline to the later of its GDELT batch time and its valid publication time. In the 2021--2023 data, 822 retained headlines were published more than seven days before GDELT recorded them, and counting them at their earlier dates would have constituted leakage.
+
+The modelling code also verifies the rule directly. It raises an error if any headline counted on day $t$ became available after 23:59:59 UTC on that day, and a unit test covers the check. The 17-day gap in June 2025 is retained as missing and not filled, and the model observes it through an explicit flag.
+
+These timing rules are controls against leakage, and no claim is made that they influence accuracy. Whether finer timing would improve prediction is a separate question, taken up in Section~\ref{ch:discussion}.
+
+\subsection{Sharing, licensing and ethics}
+All inputs are public market data or news metadata. No private accounts, trading histories or social-media profiles were collected. Binance publishes the price archive under its data terms \cite{binanceterms}, and GDELT may be used with citation \cite{gdeltterms}. The text of headlines nevertheless belongs to the publishers. For this reason the repository contains daily aggregates only, and neither the raw exports nor the headline-level tables are redistributed. The exported files used by the web interface go further: they contain no headline text and no article links, and the export script refuses to write either.
+
+A review of the 234-file working tree on 15 October 2026 searched for hard-coded passwords, API keys, tokens, private keys, credential files and headline exports, and found none. The review covered the files as they stand and did not include the Git history. The pipeline uses no credentials at all, since every input is a public download.
+
+It would also be inappropriate to present a near-chance classifier as investment advice. The results are an academic evaluation on historical data, and the interface states this on every page.
+
+\subsection{Limits of the record}
+Two gaps remain in the record, and both are small. The exact query behind the 2024--2026 export was not saved, so it was reproduced as closely as possible and the difference was measured (Section~\ref{ch:data}). The end date of 31 August 2026 also extends the original requirement of May 2025 because both sources supported it. Neither affects the comparison between models, since every model sees the same data, but both are relevant when reading the counts.

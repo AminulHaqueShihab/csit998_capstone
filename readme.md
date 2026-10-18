@@ -2,9 +2,7 @@
 
 Does adding media sentiment improve next-day Bitcoin price-direction prediction compared with
 price-only LSTM models? Target: 1 if Close(t+1) > Close(t) for the next UTC day, else 0.
-Research use only; outputs are experimental and **not financial advice**.
 
-Requirements: `Requirements Draft_01-09-26.pdf`. Proposal: `CSIT998_Group16_Project Proposal_latex.pdf`.
 
 ## Setup
 
@@ -43,6 +41,10 @@ Missing files or columns stop a stage with a message naming the stage and the fi
 | 7. Train 10 seeds per model, evaluate on test once | `python -m src.evaluate_final` | `results/model_comparison.csv`, `results/final_results.json`, `results/test_predictions.csv`, `results/model_settings.json`, `models/*.pt` |
 | 8-10. Optional FinBERT experiment | `python -m src.score_finbert`, `python -m src.build_finbert_features`, `python -m src.evaluate_finbert` | `data/processed/daily_finbert.csv`, `results/finbert_results.json` |
 | 11. Extension: 3-day / weekly direction and large-move training (not the approved primary target) | `python -m src.evaluate_extensions` | `results/extension_results.json`, `results/extension_comparison.csv` |
+| 12. Lag and feature analysis (EX-01) | `python -m src.lag_analysis` | `results/lag_analysis/`, `docs/lag_analysis.md` |
+| 13. Walk-forward evaluation (8 expanding-window folds, 2023-2026) | `python -m src.walk_forward` | `results/walk_forward/` |
+| 14. Export data for the demo web app | `python -m src.export_demo_data` | `web/public/data/` (price, sentiment and saved predictions; no headline text) |
+| 15. Report figures and the LaTeX report | `python -m src.make_report_figures`, then `cd report && latexmk -pdf main.tex` | `report/figures/*.pdf`, `report/main.pdf` |
 
 `evaluate_final` refuses to run without frozen settings and refuses a second run unless `--force` is given (the test set is evaluated once).
 
@@ -56,14 +58,11 @@ make PyTorch use the same OpenMP library: replace `<venv>/lib/python3.13/site-pa
 data/raw/        read-only source data (Binance zips; GDELT csv are git-ignored, see docs/data_sources.md)
 data/processed/  cleaned tables and the modelling table
 src/             one module per pipeline stage + features.py
+web/             Next.js demo interface (see web/README.md)
+report/          LaTeX source of the final report (main.tex, chapters/, figures/)
 tests/           pytest checks
 reports/         quality, audit and summary JSON/CSV produced by each stage
 docs/            data sources, data dictionary
 ```
 
-## Key design rules
 
-- All timestamps UTC. Prediction cutoff is 23:59:59 UTC on day t; day-t news and prices predict day t+1.
-- Features use rows <= t only (tested). Scaling parameters are fitted on training data only (later stage).
-- No imputation of prices; days without news are explicit (`no_news_flag`), never invented.
-- Raw data is never modified. See `docs/data_sources.md` for provenance and limits.

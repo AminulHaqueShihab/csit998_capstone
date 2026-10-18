@@ -228,3 +228,18 @@ data/processed/news_scored.csv.gz
 .DS_Store
 data/processed/news_finbert.csv.gz
 data/processed/finbert_parts/
+
+# Web app (web/): the Python template above ignores lib/, but web/src/lib holds app code
+!web/src/lib/
+
+# LaTeX build artefacts
+report/*.aux
+report/*.lof
+report/*.lot
+report/*.out
+report/*.toc
+report/*.synctex.gz
+report/main.pdf
+
+# Hand-off bundle for teammates (regenerable)
+share/

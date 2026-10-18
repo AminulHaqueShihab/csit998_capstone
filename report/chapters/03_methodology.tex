@@ -1,0 +1,68 @@
+\section{Methodology}
+\label{ch:methods}
+\subsection{Study design}
+The study is a controlled, time-ordered comparison with one pre-specified target, the direction of the next BTCUSDT daily close. The variable of interest is simple. Model A receives eleven price features, and Model B receives the same eleven plus five daily sentiment features. All other elements are shared: the 14-day input window, the LSTM configuration, the training and validation periods, the optimiser, the probability threshold and the final test days.
+
+The design is observational. It can show that one feature set scored higher or lower in a given period, but it cannot show that sentiment moves prices. It also says nothing about profit, because no execution or transaction-cost model was built.
+
+\subsection{Workflow}
+Each stage is implemented as a separate script, so that a change in one stage cannot silently alter another. Raw files are verified and cleaned, daily features are built, and a single modelling table joins them. A fixed chronological split and train-only scaling produce the model inputs. Tuning uses validation days only, and the frozen settings are then evaluated once on the test days. VADER is the primary sentiment method and FinBERT a secondary substitution.
+
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[font=\small, node distance=7mm and 12mm,
+ box/.style={draw=uowblue,fill=softblue,rounded corners=2pt,align=center,text width=3.2cm,minimum height=1.0cm},
+ arr/.style={-{Stealth[length=2.3mm]},thick,draw=uowblue}]
+\node[box] (bin) {Binance BTCUSDT\\daily archives};
+\node[box,right=of bin] (gd) {GDELT Bitcoin\\news metadata};
+\node[box,below=of bin] (p) {Verify and clean\\daily OHLCV};
+\node[box,below=of gd] (n) {Clean headlines\\score VADER / FinBERT};
+\node[box,below=15mm of $(p)!0.5!(n)$] (join) {UTC-joined modelling table\\causal features and target};
+\node[box,below=of join] (spl) {Train / validation / test\\train-only scaling, 14 days};
+\node[box,below left=of spl] (a) {LSTM A\\price features};
+\node[box,below right=of spl] (b) {LSTM B\\price + sentiment};
+\node[box,below=15mm of $(a)!0.5!(b)$] (eval) {Frozen test evaluation\\baselines and intervals};
+\draw[arr] (bin)--(p);\draw[arr] (gd)--(n);\draw[arr] (p)--(join);\draw[arr] (n)--(join);\draw[arr] (join)--(spl);\draw[arr] (spl)--(a);\draw[arr] (spl)--(b);\draw[arr] (a)--(eval);\draw[arr] (b)--(eval);
+\end{tikzpicture}
+\caption{The experimental pipeline, from raw archives to the frozen test evaluation.}\label{fig:pipeline}
+\end{figure}
+
+\subsection{Target and information cutoff}
+Let $C_t$ denote the Binance daily close on UTC date $t$. The target is
+\begin{equation}\label{eq:target}
+y_t=\begin{cases}1,&C_{t+1}>C_t,\\0,&C_{t+1}\leq C_t.\end{cases}
+\end{equation}
+An input window ending on date $t$ contains features from $t-13$ to $t$. Its label uses the close on $t+1$, which never appears as an input. The prediction is treated as made at 23:59:59 UTC on day $t$, so that full-day market data and eligible news are available by then. This is a daily close-to-close convention and does not describe trading at that instant.
+
+News requires more care. Each headline has a GDELT batch timestamp and, in some cases, a precise publication time. Its availability is defined as the later of the two. This can delay a headline by hours or days. The choice is deliberately conservative, because a story should not count as known merely because its stated date precedes the moment at which the archive recorded it. Headlines are then grouped by the UTC date on which they became available.
+
+\subsection{Chronological split}
+A random split would mix neighbouring market conditions across sets, so ordered dates were assigned instead. The first 30 days of price history are dropped to give the technical indicators a full look-back, and the final price day serves only as the label for the preceding day. Because each input requires 14 consecutive days, a further 13 training endpoints are unavailable. The result is 1,418 training, 273 validation and 334 test sequences.
+
+\begin{table}[htbp]\centering
+\caption{Chronological split (dates give the last input day $t$)}\label{tab:split}
+\begin{tabular}{llllr}
+\toprule
+Partition & First endpoint & Last endpoint & Up labels & Samples\\\midrule
+Training & 13 Feb 2021 & 31 Dec 2024 & 704 (49.65\%) & 1,418\\
+Validation & 1 Jan 2025 & 30 Sep 2025 & 139 (50.92\%) & 273\\
+Test & 1 Oct 2025 & 30 Aug 2026 & 162 (48.50\%) & 334\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+No observations are shuffled, and the scalers never see validation or test values. A later window may look back into earlier dates, since those observations existed before the prediction was made. Using a later target or fitting preprocessing on the future would be a different matter, and neither occurs here. All models are scored on identical test dates.
+
+\subsection{Comparisons and hypotheses}
+The primary null hypothesis states that adding VADER sentiment does not improve out-of-sample direction accuracy relative to the matched price-only LSTM. It is measured as $\Delta_{B-A}=\mathrm{Acc}(B)-\mathrm{Acc}(A)$ on the ensemble predictions, with positive values favouring sentiment. A paired bootstrap with 2,000 resamples of the test days gives a 95\% interval \cite{efron1993}. Adjacent days are not independent, and the interval is therefore read as an approximate guide and not as a formal significance test. Approaches designed for comparing classifiers on a single test set exist \cite{dietterich1998}, but they assume exchangeable observations that time-ordered data do not provide.
+
+Balanced accuracy, precision, recall, F1, confusion matrices and the spread across seeds are reported as well. The majority rule and a price-only XGBoost classifier serve as increasingly demanding references. A sentiment-enhanced XGBoost and the FinBERT models are secondary checks and do not replace the primary comparison.
+
+\subsection{Checks beyond the single split}
+A single test window is a thin basis for a conclusion, and two further analyses were therefore added after the main evaluation. Both reuse the settings frozen earlier.
+
+The walk-forward evaluation divides 2023 to 2026 into eight consecutive periods of about six months, following the rolling-origin principle \cite{tashman2000}. For each period the models are retrained on all earlier data, the last 90 days of that history are held out for early stopping, and the new period is used for testing. The pooled test set contains 1,338 days. Intervals for $\Delta_{B-A}$ are computed with blocks of seven days, because neighbouring errors tend to be correlated \cite{kunsch1989}.
+
+The lag analysis is descriptive. It asks whether the sentiment on day $t$ is associated with the price move on day $t+k$, for $k$ from $-5$ to $+5$. Negative $k$ means that sentiment follows the move, and positive $k$ that it precedes it. Association is measured by Spearman's rank correlation \cite{spearman1904}. Significance is assessed with a circular-shift permutation test, a simple form of surrogate-data testing \cite{theiler1992} that preserves the autocorrelation of both series. The analysis covers January 2021 to mid-June 2025, before the news gap, and does not use the test period.
+
+\subsection{Interpretation rules}
+Three rules governed the writing. An analysis is described as completed only when code or saved output exists for it. Correlations are not given a causal reading. And an apparent gain on a reused test set is treated as exploratory, particularly when many tasks and models were tried. The last rule applies to the three-day, seven-day and large-move extensions, which can suggest hypotheses but cannot establish a new primary result without a fresh evaluation period.

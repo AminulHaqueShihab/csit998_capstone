@@ -1,0 +1,46 @@
+\section{Introduction}
+\label{ch:intro}
+\subsection{Background}
+Bitcoin is traded continuously, and its price can move by several percent within hours in response to regulatory announcements, exchange failures or shifts in investor attitude. The news that accompanies these moves is published by a large and heterogeneous set of outlets. This combination of abundant time-stamped data and weak apparent structure has made Bitcoin a frequent test case for sequence models \cite{sezer2020,fischer2018}. It is also a setting in which overfitting is easily mistaken for skill, because a pattern fitted to history says little about the next observation.
+
+The project began from a simple hypothesis, set out in the original project proposal. If market history carries information about the following day, the tone of contemporaneous news may add to it. Studies of equities have linked media content to subsequent returns \cite{tetlock2007}, and work on Bitcoin has related measures of public attention to price movements \cite{kristoufek2013}. The argument rests on several assumptions, however. Headlines must contain information that matters to investors, and the sentiment scorer must measure it adequately. The information must also become available before the prediction is made, and its influence must persist until the next daily close. We therefore evaluate the full chain and not only the model at its end.
+
+\subsection{Problem statement}
+For each UTC date $t$, the system observes the price and news information available by the end of that day. It predicts $y_t \in \{0,1\}$, where $y_t=1$ indicates that Bitcoin closes higher on day $t+1$ than on day $t$. Direction was preferred to an exact price forecast. A one-percent rise and a one-percent fall each contribute a single label, so the classifier is judged on its decisions and not on the size of the move.
+
+The research problem is narrower than whether an LSTM can be trained, which it can. The question is whether adding daily media sentiment improves out-of-sample prediction when every other aspect of training is held fixed.
+
+Three difficulties make the question harder than it appears. Market behaviour changes over time, so an indicator that was informative in 2022 may carry no information in 2026 \cite{lo2004,cont2001}. Text data introduce further problems, including mixed languages, repeated headlines and missing timestamps. Finally, modest accuracy can look impressive in the absence of a sensible baseline. A classifier that scores 51\% appears adequate until one notes that always predicting ``not up'' scored 51.5\% on our test days.
+
+The objective is therefore twofold. The first part is a reproducible pipeline from raw files to final predictions. The second is a transparent account of what that pipeline shows, including when the effect is small or absent.
+
+\subsection{Research questions}
+Five questions guide the study.
+\begin{enumerate}[label=\textbf{RQ\arabic*.}]
+\item Does adding daily VADER headline sentiment improve the held-out next-day direction accuracy of an LSTM, relative to a price-only LSTM?
+\item Does replacing VADER with the finance-specific FinBERT model change that result?
+\item How do the LSTMs compare with a majority-class rule and a non-sequential XGBoost classifier on the same days?
+\item What do the results, the class balance and the limits of the data suggest about why accuracy remains close to 50\%?
+\item When sentiment and price move together, which comes first, and does the pattern hold across several time periods and not only one test window?
+\end{enumerate}
+The original proposal was considerably broader. It mentioned several cryptocurrencies, Twitter and Reddit, bidirectional and hybrid networks, and regression metrics. The project requirements specification reduced this to Bitcoin, one approved historical news source, a fixed next-day target, two matched LSTM variants and strong baselines. The present report is assessed against that narrower core.
+
+\subsection{Objectives and contributions}
+Five objectives were set. The first was to assemble traceable price and headline datasets that record missing data and provenance. The second was to construct price and sentiment features without using future observations. Third, comparable models were to be trained under one split, one input window, one selection rule and one decision threshold. The fourth objective was to benchmark the predictions and quantify the uncertainty around the sentiment effect. The fifth was to explain weak results without claiming more than the evidence supports.
+
+The contribution is a worked case study of a realistic machine-learning question and not a market-beating model. It illustrates how a time-ordered split, a strong trivial baseline and interval estimates alter the interpretation of a result, in line with recent calls for more careful reporting in machine-learning research \cite{pineau2021,bouthillier2021}.
+
+\subsection{Scope and deliverables}
+The asset is BTCUSDT spot trading on Binance, quoted in USDT. The data span 1 January 2021 to 31 August 2026, a total of 2,069 UTC days. News is drawn from GDELT headlines and not from full articles or social-media posts. The principal prediction horizon is one day.
+
+The deliverables are as follows.
+\begin{itemize}
+\item Processing scripts for every stage, with 62 automated Python tests and 5 tests for the web interface.
+\item Saved configurations, split definitions, scalers, model weights, predictions and evaluation tables.
+\item A web interface that replays saved predictions against the actual price (Section~\ref{ch:demo}).
+\item A README giving the run order, and file hashes for the data behind the final results.
+\end{itemize}
+Several elements of the proposal were not implemented. There is no trading backtest, no SHAP analysis, no second asset, no Twitter or Reddit data, and no architecture beyond LSTM and XGBoost. The report describes only the work that exists.
+
+\subsection{Report organisation}
+Section~\ref{ch:lit} reviews the background literature. Section~\ref{ch:methods} sets out the experimental design, and Sections~\ref{ch:data} and~\ref{ch:governance} describe the data and its governance. Sections~\ref{ch:preparation} and~\ref{ch:training} cover feature construction and model training. Results are reported in Sections~\ref{ch:results} and~\ref{ch:benchmark}, the web interface is described in Section~\ref{ch:demo}, and Sections~\ref{ch:discussion} to~\ref{ch:conclusion} interpret the findings. The appendices list the commands, definitions and the mapping to the project requirements.

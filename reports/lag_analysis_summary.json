@@ -1,0 +1,236 @@
+{
+  "sample": {
+    "start": "2021-01-10",
+    "end": "2025-06-14",
+    "days": 1617,
+    "note": "ends before the 17-day news gap; the test period (2025-10 onward) is not used"
+  },
+  "tests": {
+    "n_lag_tests": 132,
+    "nominal_p05": 32,
+    "expected_by_chance": 6.6,
+    "bonferroni_threshold": 0.0003787878787878788,
+    "bonferroni_significant": [
+      {
+        "target": "ret",
+        "measure": "vader_mean",
+        "lag_k": -5,
+        "rho": 0.0981,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_mean",
+        "lag_k": -4,
+        "rho": 0.1094,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_mean",
+        "lag_k": -3,
+        "rho": 0.1656,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_mean",
+        "lag_k": -2,
+        "rho": 0.1709,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_mean",
+        "lag_k": -1,
+        "rho": 0.2621,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_mean",
+        "lag_k": 0,
+        "rho": 0.0889,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_mean",
+        "lag_k": -5,
+        "rho": 0.129,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_mean",
+        "lag_k": -4,
+        "rho": 0.149,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_mean",
+        "lag_k": -3,
+        "rho": 0.1973,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_mean",
+        "lag_k": -2,
+        "rho": 0.241,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_mean",
+        "lag_k": -1,
+        "rho": 0.4494,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_mean",
+        "lag_k": 0,
+        "rho": 0.2251,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_net_share",
+        "lag_k": -5,
+        "rho": 0.0964,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_net_share",
+        "lag_k": -4,
+        "rho": 0.1205,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_net_share",
+        "lag_k": -3,
+        "rho": 0.1677,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_net_share",
+        "lag_k": -2,
+        "rho": 0.1664,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_net_share",
+        "lag_k": -1,
+        "rho": 0.2674,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_net_share",
+        "lag_k": 0,
+        "rho": 0.1009,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_surprise",
+        "lag_k": -3,
+        "rho": 0.095,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_surprise",
+        "lag_k": -2,
+        "rho": 0.1409,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_surprise",
+        "lag_k": -1,
+        "rho": 0.2782,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "vader_surprise",
+        "lag_k": 0,
+        "rho": 0.088,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_surprise",
+        "lag_k": -2,
+        "rho": 0.168,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_surprise",
+        "lag_k": -1,
+        "rho": 0.4649,
+        "p_perm": 0.0002
+      },
+      {
+        "target": "ret",
+        "measure": "finbert_surprise",
+        "lag_k": 0,
+        "rho": 0.2656,
+        "p_perm": 0.0002
+      }
+    ]
+  },
+  "return_correlation_by_lag": {
+    "same_day_k0": {
+      "vader_mean": 0.089,
+      "finbert_mean": 0.225,
+      "vader_net_share": 0.101,
+      "vader_surprise": 0.088,
+      "finbert_surprise": 0.266,
+      "log_article_count": 0.017
+    },
+    "sentiment_after_move_k_minus1": {
+      "vader_mean": 0.262,
+      "finbert_mean": 0.449,
+      "vader_net_share": 0.267,
+      "vader_surprise": 0.278,
+      "finbert_surprise": 0.465,
+      "log_article_count": 0.003
+    },
+    "sentiment_before_move_k_plus1_(prediction_target)": {
+      "vader_mean": 0.005,
+      "finbert_mean": -0.012,
+      "vader_net_share": 0.001,
+      "vader_surprise": -0.0,
+      "finbert_surprise": -0.007,
+      "log_article_count": 0.007
+    },
+    "k_plus1_p_values": {
+      "vader_mean": 0.84,
+      "finbert_mean": 0.602,
+      "vader_net_share": 0.978,
+      "vader_surprise": 0.981,
+      "finbert_surprise": 0.776,
+      "log_article_count": 0.782
+    }
+  },
+  "feature_screening": {
+    "n_features": 18,
+    "nominal_p05": 5,
+    "bonferroni_significant": [
+      "return_1d",
+      "log_return_1d",
+      "close_over_sma_7"
+    ],
+    "max_abs_auc_deviation_from_0.5": 0.05024811557788944
+  },
+  "interpretation_rules": "Correlation is not causation. A same-day link can arise because headlines describe the day's price move. Only k > 0 speaks to prediction."
+}
