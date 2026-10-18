@@ -219,15 +219,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# --- Project data policy ---
-# Raw GDELT exports are large (~90 MB each); documented in docs/data_sources.md and re-creatable via BigQuery.
-data/raw/gdelt/*.csv
-# Regenerable intermediate news tables (rebuilt by src.prepare_news / src.build_sentiment)
-data/processed/news_clean.csv.gz
-data/processed/news_scored.csv.gz
-.DS_Store
-data/processed/news_finbert.csv.gz
-data/processed/finbert_parts/
+
 
 # Web app (web/): the Python template above ignores lib/, but web/src/lib holds app code
 !web/src/lib/

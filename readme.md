@@ -3,6 +3,8 @@
 Does adding media sentiment improve next-day Bitcoin price-direction prediction compared with
 price-only LSTM models? Target: 1 if Close(t+1) > Close(t) for the next UTC day, else 0.
 
+**Live demo:** https://crypto-price-prediction-demo.vercel.app/ (saved predictions against the actual price; not financial advice)
+
 
 ## Setup
 
@@ -58,7 +60,7 @@ make PyTorch use the same OpenMP library: replace `<venv>/lib/python3.13/site-pa
 data/raw/        read-only source data (Binance zips; GDELT csv are git-ignored, see docs/data_sources.md)
 data/processed/  cleaned tables and the modelling table
 src/             one module per pipeline stage + features.py
-web/             Next.js demo interface (see web/README.md)
+web/             Next.js demo interface, deployed at https://crypto-price-prediction-demo.vercel.app/ (see web/README.md)
 report/          LaTeX source of the final report (main.tex, chapters/, figures/)
 tests/           pytest checks
 reports/         quality, audit and summary JSON/CSV produced by each stage
