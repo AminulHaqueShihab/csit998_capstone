@@ -54,14 +54,13 @@
 
 \begin{titlepage}
 \centering
-\vspace*{2.5cm}
-{\large University of Wollongong}\\[0.3cm]
+\vspace*{0.5cm}
+\includegraphics[width=0.4\textwidth]{uow-logo.png}\\[0.7cm]
+{\large School of Computing and Information Technology}\\[0.5cm]
 {\large CSIT998 Professional Capstone Project}\\[0.2cm]
-{\large Group 16}\\[1.2cm]
-\rule{\textwidth}{0.6pt}\\[0.6cm]
-{\LARGE\bfseries Cryptocurrency Price-Direction Prediction\\[0.2cm] Using LSTM Models and Media Sentiment Analysis\par}
-\vspace{0.6cm}
-\rule{\textwidth}{0.6pt}\\[1.4cm]
+{\large Group 16}\\[1.4cm]
+{\Large\bfseries Cryptocurrency Price-Direction Prediction\\[0.2cm] Using LSTM Models and Media Sentiment Analysis\par}
+\vspace{1.4cm}
 {\large\bfseries Authors}\\[0.4cm]
 {\normalsize
 \begin{tabular}{lll}
@@ -72,13 +71,13 @@ Almas Ashrafi & 8923024 & aa4903@uowmail.edu.au
 \end{tabular}\par}
 \vspace{1.2cm}
 {\large\bfseries Supervisor}\\[0.3cm]
-{\normalsize Wanqing Li}\\[2cm]
+{\normalsize Professor Wanqing Li}\\[1.6cm]
 {\normalsize October 2026}
 \end{titlepage}
 
 \pagenumbering{roman}
 \begin{abstract}
-Predicting whether Bitcoin will close higher tomorrow is difficult, and it is unclear whether news sentiment adds information beyond prices. This project tests the question with 2,069 daily BTCUSDT observations from Binance (January 2021 to August 2026) and 250,475 cleaned Bitcoin headlines from GDELT. A price-only LSTM is compared with an LSTM that also receives daily VADER sentiment, using a 14-day window, one frozen configuration and ten random seeds. On 334 untouched test days, the price-only ensemble was correct on 50.0\% of days, the VADER version on 48.5\%, and a rule that always predicts ``not up'' on 51.5\%. The 1.5-point gap has a 95\% bootstrap interval of $-5.7$ to $+2.4$ points, and FinBERT sentiment led to the same conclusion. An eight-period walk-forward evaluation over 1,338 days agreed, with no reliable sentiment effect. A lag analysis suggests why: FinBERT sentiment correlates 0.45 with the previous day's return and about zero with the next day's, so headlines mostly describe moves that have already happened. A web interface replays the saved predictions against the actual price. The main contribution is a transparent, reproducible evaluation of a near-chance result.
+Whether news sentiment carries information about next-day Bitcoin direction beyond that already contained in prices remains an open question. This study addresses it using 2,069 daily BTCUSDT observations from Binance (January 2021 to August 2026) and 250,475 cleaned Bitcoin headlines from GDELT. A price-only LSTM is compared with an otherwise identical LSTM that also receives daily VADER sentiment, under a 14-day input window, a single frozen configuration and ten random seeds. On 334 held-out test days, the price-only ensemble classified 50.0\% of days correctly, the VADER variant 48.5\%, and a majority-class rule that always predicts ``not up'' 51.5\%. The 1.5-point difference between the two networks has a 95\% bootstrap interval of $-5.7$ to $+2.4$ points, and substituting FinBERT sentiment did not change this conclusion. An eight-period walk-forward evaluation over 1,338 days gave the same result, with no reliable sentiment effect. A lag analysis indicates that FinBERT sentiment correlates 0.45 with the preceding day's return but approximately zero with the following day's, which suggests that headlines largely describe price movements that have already occurred. A web interface replays the saved predictions against realised prices. The principal contribution is a transparent, reproducible evaluation of a near-chance outcome.
 \end{abstract}
 
 \newpage
