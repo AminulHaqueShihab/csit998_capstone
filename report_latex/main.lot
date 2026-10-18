@@ -1,0 +1,17 @@
+\contentsline {table}{\numberline {1}{\ignorespaces Selected related work and its relation to this project}}{6}{table.1}%
+\contentsline {table}{\numberline {2}{\ignorespaces Chronological split (dates give the last input day $t$)}}{8}{table.2}%
+\contentsline {table}{\numberline {3}{\ignorespaces Headline accounting by period. The 2024--2026 column is the full-period figure minus the 2021--2023 figure.}}{11}{table.3}%
+\contentsline {table}{\numberline {4}{\ignorespaces SHA-256 fingerprints of the raw GDELT exports used for the final results}}{13}{table.4}%
+\contentsline {table}{\numberline {5}{\ignorespaces The eleven price features used by Model A and reused unchanged by Model B}}{15}{table.5}%
+\contentsline {table}{\numberline {6}{\ignorespaces The five additional inputs supplied to Model B}}{16}{table.6}%
+\contentsline {table}{\numberline {7}{\ignorespaces Frozen primary settings}}{18}{table.7}%
+\contentsline {table}{\numberline {8}{\ignorespaces Files linking training to the reported results}}{19}{table.8}%
+\contentsline {table}{\numberline {9}{\ignorespaces Primary held-out results on the 334 common test days. Mean $\pm $ SD is across seeds; ensemble columns use averaged probabilities.}}{20}{table.9}%
+\contentsline {table}{\numberline {10}{\ignorespaces Positive-class metrics of the ensembles on the main test split}}{21}{table.10}%
+\contentsline {table}{\numberline {11}{\ignorespaces Ensemble confusion counts (rows give the actual outcome)}}{23}{table.11}%
+\contentsline {table}{\numberline {12}{\ignorespaces Paired ensemble comparisons (Model B minus Model A)}}{24}{table.12}%
+\contentsline {table}{\numberline {13}{\ignorespaces Walk-forward results pooled over 1,338 test days. The guessing band is $50\% \pm 2.7$ points.}}{25}{table.13}%
+\contentsline {table}{\numberline {14}{\ignorespaces Ensemble accuracy (\%) in each walk-forward period}}{26}{table.14}%
+\contentsline {table}{\numberline {15}{\ignorespaces Ensemble accuracy (\%) on the test days for the extension tasks. The 1\% and 2\% rows train only on days whose next-day move was at least that large, and score all test days.}}{31}{table.15}%
+\contentsline {table}{\numberline {16}{Possible explanations for the plateau, the evidence available, and tests that would distinguish them}}{37}{table.16}%
+\contentsline {table}{\numberline {17}{Requirements and supporting evidence}}{48}{table.17}%

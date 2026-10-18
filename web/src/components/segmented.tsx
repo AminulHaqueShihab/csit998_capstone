@@ -25,7 +25,7 @@ export function Segmented<T extends string>({
       className="flex-wrap"
     >
       {options.map((o) => (
-        <ToggleGroupItem key={o.value} value={o.value} className="px-3 text-xs">
+        <ToggleGroupItem key={o.value} value={o.value} className="px-3 text-xs aria-pressed:bg-primary! aria-pressed:text-primary-foreground! data-[state=on]:bg-primary! data-[state=on]:text-primary-foreground!">
           {o.label}
         </ToggleGroupItem>
       ))}

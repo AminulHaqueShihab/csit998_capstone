@@ -27,7 +27,7 @@ export function SentimentChart({ data }: { data: SentimentPoint[] }) {
   });
   const short = data.length <= 140;
   return (
-    <ChartContainer config={config} className="h-[200px] w-full">
+    <ChartContainer config={config} className="h-[170px] w-full">
       <LineChart data={data} syncId="demo" margin={{ left: 4, right: 12, top: 8 }}>
         <CartesianGrid vertical={false} />
         <XAxis dataKey="date" tickLine={false} axisLine={false} minTickGap={44} tickFormatter={(d: string) => (short ? d.slice(5) : d.slice(0, 7))} />

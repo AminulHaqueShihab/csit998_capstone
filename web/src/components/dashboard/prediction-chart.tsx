@@ -73,7 +73,7 @@ export function PredictionChart({ data }: { data: ChartPoint[] }) {
   const days = data.length;
   const short = days <= 140;
   return (
-    <ChartContainer config={config} className="h-[340px] w-full">
+    <ChartContainer config={config} className="h-[360px] w-full">
       <LineChart data={data} syncId="demo" margin={{ left: 4, right: 12, top: 10 }}>
         <CartesianGrid vertical={false} />
         <XAxis

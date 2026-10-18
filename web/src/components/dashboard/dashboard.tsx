@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Segmented } from "@/components/segmented";
 import { MarkerLegend, PredictionChart, type ChartPoint } from "./prediction-chart";
@@ -73,25 +72,24 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
   const half = chanceHalfWidth(s.n);
   const covered = chartData.some((p) => p.pred !== null);
 
-  const stat = (label: string, value: string, note?: string) => (
-    <Card size="sm">
-      <CardHeader>
-        <CardDescription>{label}</CardDescription>
-        <CardTitle className="text-2xl tabular-nums">{value}</CardTitle>
-        {note ? <p className="text-xs text-muted-foreground">{note}</p> : null}
-      </CardHeader>
-    </Card>
+  const stat = (label: string, value: string, note?: string, highlight = false) => (
+    <div className={`space-y-0.5 px-4 py-3 ${highlight ? "bg-secondary/60" : ""}`}>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className={`text-2xl font-semibold tabular-nums ${highlight ? "text-secondary-foreground" : ""}`}>{value}</div>
+      {note ? <div className="text-xs text-muted-foreground">{note}</div> : null}
+    </div>
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <Card>
-        <CardContent className="space-y-4 pt-4">
-          <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-            <div className="space-y-1">
-              <label htmlFor="from" className="text-xs font-medium text-muted-foreground">From</label>
+        <CardContent className="grid gap-x-8 gap-y-4 pt-4 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <div className="text-xs font-medium text-muted-foreground">Dates</div>
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 id="from"
+                aria-label="From date"
                 type="date"
                 min={meta.data.start}
                 max={meta.data.end}
@@ -99,11 +97,10 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
                 onChange={(e) => e.target.value && setRange((r) => ({ ...r, from: e.target.value }))}
                 className="block h-8 rounded-lg border border-input bg-background px-2 text-sm"
               />
-            </div>
-            <div className="space-y-1">
-              <label htmlFor="to" className="text-xs font-medium text-muted-foreground">To</label>
+              <span className="text-muted-foreground">to</span>
               <input
                 id="to"
+                aria-label="To date"
                 type="date"
                 min={meta.data.start}
                 max={meta.data.end}
@@ -112,21 +109,21 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
                 className="block h-8 rounded-lg border border-input bg-background px-2 text-sm"
               />
             </div>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Date range presets">
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Date range presets">
               {PRESETS.map((p) => (
-                <Button key={p.id} variant="outline" size="sm" onClick={() => setRange(presetRange(p.id, meta.data, test))}>
+                <Button key={p.id} variant="ghost" size="xs" className="text-muted-foreground hover:text-secondary-foreground" onClick={() => setRange(presetRange(p.id, meta.data, test))}>
                   {p.label}
                 </Button>
               ))}
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <div className="space-y-1">
+          <div className="space-y-4">
+            <div className="space-y-1.5">
               <div className="text-xs font-medium text-muted-foreground">Model</div>
               <Segmented<ModelKey> label="Model" value={model} onChange={setModel} options={MODELS.map((m) => ({ value: m, label: MODEL_SHORT[m] }))} />
             </div>
-            <div className="space-y-1">
-              <div className="text-xs font-medium text-muted-foreground">Predictions</div>
+            <div className="space-y-1.5">
+              <div className="text-xs font-medium text-muted-foreground">Predictions ({set.from} to {set.to})</div>
               <Segmented<SetKey>
                 label="Prediction set"
                 value={setKey}
@@ -137,26 +134,23 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
                 ]}
               />
             </div>
-            <Badge variant="outline" className="self-end">
-              Predictions cover {set.from} to {set.to}
-            </Badge>
           </div>
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="Summary for the selected dates">
-        {stat("Accuracy", pct(s.accuracy), half !== null ? `Guessing: 50% ± ${(half * 100).toFixed(1)} pts` : "No predictions in range")}
-        {stat("Days predicted", String(s.n), `${s.tp + s.tn} right · ${s.fp + s.fn} wrong`)}
-        {stat("Predicted up", pct(s.predictedUpShare), "share of days")}
-        {stat("Actually up", pct(s.actualUpShare), "share of days")}
-      </section>
+      <Card>
+        <CardContent className="grid grid-cols-2 divide-x divide-y overflow-hidden p-0 lg:grid-cols-4 lg:divide-y-0" aria-label="Summary for the selected dates">
+          {stat("Accuracy", pct(s.accuracy), half !== null ? `Guessing: 50% ± ${(half * 100).toFixed(1)} pts` : "No predictions in range", true)}
+          {stat("Days predicted", String(s.n), `${s.tp + s.tn} right · ${s.fp + s.fn} wrong`)}
+          {stat("Predicted up", pct(s.predictedUpShare), "share of days")}
+          {stat("Actually up", pct(s.actualUpShare), "share of days")}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Bitcoin price and predictions</CardTitle>
-          <CardDescription>
-            {MODEL_LABELS[model]} · {lo} to {hi}. Each marker is that day&apos;s prediction for whether the next day closes higher.
-          </CardDescription>
+          <CardDescription>{MODEL_LABELS[model]} · each marker is that day&apos;s call for the next day.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {!covered ? (
@@ -173,7 +167,7 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
         <CardHeader className="flex-row flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle>News sentiment</CardTitle>
-            <CardDescription>Daily average score of Bitcoin headlines (−1 negative to +1 positive). Grey bands: no news data.</CardDescription>
+            <CardDescription>Daily headline score, −1 to +1. Grey bands: no news.</CardDescription>
           </div>
           <Segmented<Source>
             label="Sentiment method"
@@ -193,9 +187,7 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
       <Card>
         <CardHeader>
           <CardTitle>All models on the same days</CardTitle>
-          <CardDescription>
-            {s.n} days with predictions between {lo} and {hi}.
-          </CardDescription>
+          <CardDescription>{s.n} days with predictions, {lo} to {hi}.</CardDescription>
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
@@ -212,7 +204,7 @@ export function Dashboard({ meta, prices, predictions }: { meta: Meta; prices: P
               {MODELS.map((m) => {
                 const x = scoreModel(rows, m, predictions.threshold);
                 return (
-                  <TableRow key={m} data-state={m === model ? "selected" : undefined}>
+                  <TableRow key={m} data-state={m === model ? "selected" : undefined} className={m === model ? "bg-secondary/60" : undefined}>
                     <TableCell className="font-medium">{MODEL_LABELS[m]}</TableCell>
                     <TableCell className="text-right tabular-nums">{pct(x.accuracy)}</TableCell>
                     <TableCell className="text-right tabular-nums">{pct(x.balancedAccuracy)}</TableCell>

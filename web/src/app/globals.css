@@ -55,20 +55,20 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.37 0.07 250); /* deep blue (brand) */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.95 0.045 70); /* warm amber tint (secondary) */
+  --secondary-foreground: oklch(0.38 0.09 55);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.95 0.045 70);
+  --accent-foreground: oklch(0.38 0.09 55);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.55 0.1 250);
   /* chart palette: colour-blind-safe (Okabe-Ito); the rest of the theme is the shadcn default */
-  --chart-1: #0072b2;
+  --chart-1: #1f5f99;
   --chart-2: #d97706;
   --chart-3: #009e73;
   --chart-4: #b4548f;
