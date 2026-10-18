@@ -224,14 +224,9 @@ __marimo__/
 # Web app (web/): the Python template above ignores lib/, but web/src/lib holds app code
 !web/src/lib/
 
-# LaTeX build artefacts
-report/*.aux
-report/*.lof
-report/*.lot
-report/*.out
-report/*.toc
-report/*.synctex.gz
-report/main.pdf
+# LaTeX: keep .aux/.toc/.lof/.lot so a single compile shows contents, lists and citations
+report_latex/*.log
+report_latex/*.synctex.gz
 
 # Hand-off bundle for teammates (regenerable)
 share/
